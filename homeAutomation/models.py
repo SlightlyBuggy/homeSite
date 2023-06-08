@@ -126,3 +126,9 @@ class DeviceStatusLog(BaseModel):
 
     supply_voltage = models.FloatField()
     water_level_inches = models.FloatField()
+
+
+# store global settings - not sure what exactly, but it might be useful
+class Setting(BaseModel):
+    key = models.TextField()
+    value = models.TextField()
