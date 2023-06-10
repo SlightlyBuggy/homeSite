@@ -6,6 +6,7 @@ class BaseModel(models.Model):
 
     created = models.DateTimeField(auto_now_add=True)
     modified = models.DateTimeField(auto_now=True)
+    objects = models.Manager()
 
     class Meta:
         abstract = True
@@ -50,6 +51,10 @@ class Device(BaseModel):
     # the cycle will repeat this many times
     watering_repetitions = models.IntegerField(max_length=1)
 
+    # based on pin strapping
+    # TODO: implement pin strapping in Arduino code
+    device_id = models.IntegerField(max_length=2)
+
     class Meta:
         abstract = True
 
@@ -70,7 +75,7 @@ class ScheduleTypes(models.TextChoices):
 # Device-specific schedule configuration
 class IOTDeviceSchedule(BaseModel):
 
-    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
 
     schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
@@ -86,6 +91,9 @@ class IOTDeviceSchedule(BaseModel):
 
     # this will be managed by the automation
     next_execution = models.DateTimeField()
+
+    # whether to consider this schedule
+    active = models.BooleanField(default=False)
 
 
 # log of scheduled actions
@@ -103,7 +111,7 @@ class IOTDeviceScheduleExecution(BaseModel):
 
 
 # rain log
-class RainModel(BaseModel):
+class RainLog(BaseModel):
 
     start_time: models.DateTimeField()
     end_time: models.DateTimeField()
