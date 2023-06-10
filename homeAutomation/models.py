@@ -75,7 +75,7 @@ class ScheduleTypes(models.TextChoices):
 # Device-specific schedule configuration
 class IOTDeviceSchedule(BaseModel):
 
-    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
+    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
 
     schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
@@ -99,7 +99,7 @@ class IOTDeviceSchedule(BaseModel):
 # log of scheduled actions
 class IOTDeviceScheduleExecution(BaseModel):
 
-    iot_device_schedule = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
+    iot_device_schedule_id = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
 
     schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
@@ -118,19 +118,19 @@ class RainLog(BaseModel):
     total_amount_inches = models.FloatField()
 
 
-# water log (ha)
-class WaterLog(BaseModel):
-    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+# wanted to call this WaterLog (ha) but that was too confusing
+class SprinklerLog(BaseModel):
+    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
     start_time: models.DateTimeField()
     end_time: models.DateTimeField()
     water_qty_at_start_gallons = models.FloatField()
-    water_level_at_end_gallons = models.FloatField()
+    water_level_at_end_galflons = models.FloatField()
 
 
 # device status
 class DeviceStatusLog(BaseModel):
-    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
     supply_voltage = models.FloatField()
     water_level_inches = models.FloatField()
