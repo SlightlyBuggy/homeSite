@@ -68,7 +68,7 @@ class IOTDevice(Device):
 
 # types of schedules
 class ScheduleTypes(models.TextChoices):
-    WATER_LAWN = 'water_lawn'
+    SPRINKLE = 'sprinkle'
     GET_DEVICE_STATUS = 'get_status'
 
 
@@ -104,9 +104,7 @@ class IOTDeviceScheduleExecution(BaseModel):
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
 
     start_time: models.DateTimeField()
-    end_time: models.DateTimeField()
     exit_code = models.IntegerField(max_length=2)
-    messages = models.JSONField()
 
 
 # rain log
