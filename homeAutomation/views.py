@@ -3,8 +3,8 @@ import json
 from django.http import JsonResponse
 from .mqtt import client as mqtt_client
 from .models import IOTDevice, IOTDeviceSchedule, IOTDeviceScheduleExecution, ScheduleTypes
-from util.automation_utils import send_mqtt_message, add_minutes_to_dt, get_last_watering_and_status, COMMAND_TOPIC, \
-    MESSAGE_TOPIC
+from util.automation_utils import send_mqtt_message, get_last_watering_and_status, COMMAND_TOPIC, MINUTES_IN_DAY, \
+    MESSAGE_TOPIC, get_next_scheduled_daily_time
 
 
 def publish_message(request):
@@ -59,7 +59,8 @@ def execute_scheduled_tasks(request):
 
                     if watering_in_progress:
                         # since a water event is in progress, push the next_execution back by interval_minutes from now
-                        active_schedule.next_execution = add_minutes_to_dt(current_dt, active_schedule.interval_minutes)
+                        active_schedule.next_execution = get_next_scheduled_daily_time(schedule=active_schedule,
+                                                                                       starting_at=current_dt)
                         active_schedule.save()
                         continue
 
@@ -67,7 +68,8 @@ def execute_scheduled_tasks(request):
                     # the schedule if that time is in the future.  This accounts for rain and manually-triggered
                     # watering events
                     if last_water_end:
-                        next_required_sprinkling = add_minutes_to_dt(last_water_end, active_schedule.interval_minutes)
+                        next_required_sprinkling = get_next_scheduled_daily_time(schedule=active_schedule,
+                                                                                 starting_at=last_water_end)
 
                         if next_required_sprinkling > current_dt:
                             active_schedule.next_execution = next_required_sprinkling
@@ -80,15 +82,18 @@ def execute_scheduled_tasks(request):
                                     'message': 'water',
                                     'message_body': {
                                         'watering_length_minutes': device.watering_length_minutes,
-                                        'watering_wait_minutes': device.watering_wait_minutes
+                                        'watering_wait_minutes': device.watering_wait_minutes,
                                         'watering_repetitions': device.watering_repetitions,
                                     }
                                   }
                     mqtt_response = send_mqtt_message(COMMAND_TOPIC, water_body)
-                    # TODO: consider how to handle case where the device is commanded to water, but it can't.  Do we
-                    # just keep trying?  We need to not spam this command.  Maybe we need another loop that looks for
-                    # watering commands that have been sent, but watering hasn't happened by X hours later.  Then it
-                    # reschedules?
+
+                    # push water schedule ahead by one day to allow sprinkling to occur.  if sprinkling happens,
+                    # the logic above will push out the schedule.  if it is not, it will be retried on that day
+                    # this allows things like manual filling of barrels or water transfer to work
+                    active_schedule.next_execution = get_next_scheduled_daily_time(schedule=active_schedule,
+                                                                                   starting_at=current_dt,
+                                                                                   interval_minutes=MINUTES_IN_DAY)
 
 
                 case _:

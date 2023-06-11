@@ -73,16 +73,15 @@ class ScheduleTypes(models.TextChoices):
 
 
 # Device-specific schedule configuration
+# TODO: how to handle events that happen more than once per hour?
 class IOTDeviceSchedule(BaseModel):
 
     device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
 
     schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
-    # If only day_of_week is populated, this means that day
-    # at midnight.  If only hour is populated, this means every day on that hour.  if only minute, every hour on that
-    # minute.  If more values are populated, then the schedule is filtered accordingly
-    day_of_week = models.IntegerField(max_length=1)
+    # If only hour is populated, this means every day on that hour.  if only minute, every hour on that
+    # minute.  Only one of the two should be populated
     hour = models.IntegerField(max_length=2)
     minute = models.IntegerField(max_length=2)
 
