@@ -4,12 +4,6 @@ from ..mqtt import client as mqtt_client
 from ..models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
 import datetime
 
-COMMAND_TOPIC = 'device_commands'
-REPORT_TOPIC = 'device_messages'
-COMMAND_SPRINKLE = 'sprinkle'
-COMMAND_STATUS = 'status'
-REPORT_SPRINKLING = 'sprinkle_report'
-REPORT_STATUS = 'status_report'
 
 WATERING_SCHEDULE_PUSH_MINUTES = 360
 MINUTES_IN_DAY = 1440

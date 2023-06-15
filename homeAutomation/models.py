@@ -31,29 +31,29 @@ class Device(BaseModel):
     sensor_reading_at_zero = models.FloatField(default=0.0)
 
     # water storage configuration
-    num_barrels = models.IntegerField(max_length=2)
+    num_barrels = models.IntegerField()
     barrel_cross_sectional_area_in2 = models.FloatField()
 
     # watering configuration
     # minimum time to wait between water events before trying to water
-    minimum_water_interval_hours = models.IntegerField(max_length=3)
+    minimum_water_interval_hours = models.IntegerField()
 
     # watering config
     # to allow the soil to absorb water, the sprinkler will run for watering_length_minutes, then wait for
     # watering_wait_minutes, and do that watering_repetitions times
 
     # when watering, this is how long the sprinklers will run
-    watering_length_minutes = models.IntegerField(max_length=2)
+    watering_length_minutes = models.IntegerField()
 
     # the system will wait this long until running the sprinkler again
-    watering_wait_minutes = models.IntegerField(max_length=2)
+    watering_wait_minutes = models.IntegerField()
 
     # the cycle will repeat this many times
-    watering_repetitions = models.IntegerField(max_length=1)
+    watering_repetitions = models.IntegerField()
 
     # based on pin strapping
     # TODO: implement pin strapping in Arduino code
-    device_id = models.IntegerField(max_length=2)
+    device_id = models.IntegerField()
 
     class Meta:
         abstract = True
@@ -63,7 +63,7 @@ class Device(BaseModel):
 class IOTDevice(Device):
 
     ipv4_address = models.CharField(max_length=15)
-    port = models.IntegerField(max_length=5)
+    port = models.IntegerField()
 
 
 # types of schedules
@@ -73,20 +73,19 @@ class ScheduleTypes(models.TextChoices):
 
 
 # Device-specific schedule configuration
-# TODO: how to handle events that happen more than once per hour?
 class IOTDeviceSchedule(BaseModel):
 
     device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
 
-    schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
+    schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
     # If only hour is populated, this means every day on that hour.  if only minute, every hour on that
     # minute.  Only one of the two should be populated
-    hour = models.IntegerField(max_length=2)
-    minute = models.IntegerField(max_length=2)
+    hour = models.IntegerField()
+    minute = models.IntegerField()
 
     # if this is populated, schedule initially starts at above value then repeats every interval_minutes
-    interval_minutes = models.IntegerField(max_length=4)
+    interval_minutes = models.IntegerField()
 
     # this will be managed by the automation
     next_execution = models.DateTimeField()
@@ -100,11 +99,11 @@ class IOTDeviceScheduleExecution(BaseModel):
 
     iot_device_schedule_id = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
 
-    schedule_type = models.CharField(max_length=2, choices=ScheduleTypes.choices,
+    schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
 
     start_time: models.DateTimeField()
-    exit_code = models.IntegerField(max_length=2)
+    exit_code = models.IntegerField()
 
 
 # rain log
@@ -122,7 +121,7 @@ class SprinklerLog(BaseModel):
     start_time: models.DateTimeField()
     end_time: models.DateTimeField()
     water_qty_at_start_gallons = models.FloatField()
-    water_level_at_end_galflons = models.FloatField()
+    water_level_at_end_gallons = models.FloatField()
 
 
 # device status

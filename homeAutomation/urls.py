@@ -20,8 +20,9 @@ from . import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('publish', views.publish_message, name='publish'),
-    path('test_message', views.test_device_message, name='test_message'),
-    path('test_command', views.test_device_command, name='test_command'),
+    path('test_device_command_status', views.test_device_command_status, name='test_device_command_status'),
+    path('test_device_command_sprinkle_start', views.test_device_command_sprinkle_start,
+         name='test_device_command_sprinkle_start'),
     path('execute_scheduled_tasks', views.execute_scheduled_tasks, name='execute_scheduled_tasks')
 ]
 
