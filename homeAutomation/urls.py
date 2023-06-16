@@ -23,6 +23,7 @@ urlpatterns = [
     path('test_device_command_status', views.test_device_command_status, name='test_device_command_status'),
     path('test_device_command_sprinkle_start', views.test_device_command_sprinkle_start,
          name='test_device_command_sprinkle_start'),
+    path('get_precip_observations', views.get_precip_observations, name='get_precip_observations'),
     path('execute_scheduled_tasks', views.execute_scheduled_tasks, name='execute_scheduled_tasks')
 ]
 

@@ -4,8 +4,10 @@ from .models import IOTDevice, IOTDeviceSchedule, ScheduleTypes
 
 import homeAutomation.util.automation_utils as util
 import homeAutomation.service.command_service as command_service
+import homeAutomation.service.weather_service as weather_service
 import homeAutomation.mqtt as mqtt
 from django.views.decorators.http import require_http_methods
+from django.http import JsonResponse
 
 
 # TODO: make these get/post/put only as needed
@@ -38,6 +40,14 @@ def test_device_command_sprinkle_start(request):
     }
     mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
+
+
+def get_precip_observations(request):
+    precip_observations = weather_service.get_precip_observations(test=True)
+    print("Fetched test precipitation report")
+    print(precip_observations)
+
+    return JsonResponse({'precip_events': precip_observations.precip_events})
 
 
 def execute_scheduled_tasks(request):
