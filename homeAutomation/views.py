@@ -21,23 +21,36 @@ def publish_message(request):
 
 @require_http_methods(["GET"])
 def test_device_command_status(request):
+    request_data = json.loads(request.body)
 
-    test_payload = {'device_id': 0, 'command': mqtt.COMMAND_STATUS, 'body': {}}
+    device_id = request_data['device_id']
+
+    test_payload = {'device_id': device_id, 'command': mqtt.COMMAND_STATUS, 'body': {}}
 
     mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
 def test_device_command_sprinkle_start(request):
+    request_data = json.loads(request.body)
+
+    device_id = request_data['device_id']
+
     test_payload = {
-        'device_id': '0',
+        'device_id': device_id,
         'command': mqtt.COMMAND_SPRINKLE_START,
         'body': {
-            'watering_length_minutes': 1,
-            'watering_wait_minutes': 1,
-            'watering_repetitions': 2,
+
         }
     }
+
+    # add request params
+    if 'watering_length_minutes' in request_data:
+        test_payload['body']['watering_length_minutes'] = request_data['watering_length_minutes']
+
+    if 'watering_length_seconds' in request_data:
+        test_payload['body']['watering_length_seconds'] = request_data['watering_length_seconds']
+
     mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 

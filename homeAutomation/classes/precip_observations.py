@@ -47,5 +47,3 @@ class PrecipObservations:
                 self.precip_events[-1]['start'] = timestamp
 
             precip_prior_observation = precip_this_observation
-
-
