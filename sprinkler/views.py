@@ -8,6 +8,17 @@ import sprinkler.service.weather_service as weather_service
 import sprinkler.mqtt as mqtt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
+from django.shortcuts import render
+from .models import IOTDevice
+
+
+def test_commands(request):
+
+    all_devices = IOTDevice.objects.all()
+
+    context = {'all_devices': all_devices}
+
+    return render(request, 'sprinkler/test_commands.html', context)
 
 
 # TODO: make these get/post/put only as needed

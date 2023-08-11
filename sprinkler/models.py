@@ -62,6 +62,9 @@ class Device(BaseModel):
 # include properties specific to a connected device.  All devices should be connected, but this is a nice abstraction
 class IOTDevice(Device):
 
+    def __str__(self):
+        return self.name
+
     ipv4_address = models.CharField(max_length=15)
     port = models.IntegerField()
 

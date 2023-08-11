@@ -19,6 +19,7 @@ from sprinkler import views
 app_name = 'sprinkler'
 urlpatterns = [
     path('publish', views.publish_message, name='publish'),
+    path('test_commands', views.test_commands, name='test_commands'),
     path('test_device_command_status', views.test_device_command_status, name='test_device_command_status'),
     path('test_device_command_sprinkle_start', views.test_device_command_sprinkle_start,
          name='test_device_command_sprinkle_start'),
