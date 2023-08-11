@@ -1,8 +1,7 @@
 import requests
-from homeAutomation.classes.precip_observations import PrecipObservations
+from sprinkler.classes.precip_observations import PrecipObservations
 import json
 import os
-import homeAutomation.resources
 
 
 def get_precip_observations(test=False) -> PrecipObservations | None:

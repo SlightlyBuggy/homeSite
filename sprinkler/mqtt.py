@@ -1,6 +1,6 @@
 import paho.mqtt.client as mqtt
 import json
-from . import settings
+from homeAutomation import settings
 
 # server to device topic
 COMMAND_TOPIC = 'command'

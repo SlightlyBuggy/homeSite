@@ -1,7 +1,7 @@
 import json
 from django.http import JsonResponse
-from ..mqtt import client as mqtt_client
-from ..models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
+from sprinkler.mqtt import client as mqtt_client
+from sprinkler.models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
 import datetime
 
 

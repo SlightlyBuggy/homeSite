@@ -13,12 +13,17 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import path
+from sprinkler import views
 
+app_name = 'sprinkler'
 urlpatterns = [
-    path('', include('sprinkler.urls')),
-    path('admin/', admin.site.urls),
+    path('publish', views.publish_message, name='publish'),
+    path('test_device_command_status', views.test_device_command_status, name='test_device_command_status'),
+    path('test_device_command_sprinkle_start', views.test_device_command_sprinkle_start,
+         name='test_device_command_sprinkle_start'),
+    path('get_precip_observations', views.get_precip_observations, name='get_precip_observations'),
+    path('execute_scheduled_tasks', views.execute_scheduled_tasks, name='execute_scheduled_tasks')
 ]
 
 

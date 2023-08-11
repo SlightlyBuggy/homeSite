@@ -1,6 +1,6 @@
-import homeAutomation.util.automation_utils as util
-import homeAutomation.mqtt as mqtt
-from homeAutomation.models import IOTDeviceSchedule, IOTDevice
+import util.automation_utils as util
+import sprinkler.mqtt as mqtt
+from sprinkler.models import IOTDeviceSchedule, IOTDevice
 import datetime
 
 

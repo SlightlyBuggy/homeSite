@@ -2,10 +2,10 @@ import datetime
 import json
 from .models import IOTDevice, IOTDeviceSchedule, ScheduleTypes
 
-import homeAutomation.util.automation_utils as util
-import homeAutomation.service.command_service as command_service
-import homeAutomation.service.weather_service as weather_service
-import homeAutomation.mqtt as mqtt
+import util.automation_utils as util
+import sprinkler.service.command_service as command_service
+import sprinkler.service.weather_service as weather_service
+import sprinkler.mqtt as mqtt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 
