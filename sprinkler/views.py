@@ -10,6 +10,7 @@ from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse
 from django.shortcuts import render
 from .models import IOTDevice
+from django.views.decorators.csrf import csrf_exempt, csrf_protect
 
 
 def test_commands(request):
@@ -22,6 +23,7 @@ def test_commands(request):
 
 
 # TODO: make these get/post/put only as needed
+
 def publish_message(request):
     # TODO: validate request body
     request_data = json.loads(request.body)
@@ -30,7 +32,7 @@ def publish_message(request):
     return mqtt_response
 
 
-@require_http_methods(["GET"])
+@csrf_exempt
 def test_device_command_status(request):
     request_data = json.loads(request.body)
 
@@ -41,7 +43,7 @@ def test_device_command_status(request):
     mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
-
+@csrf_exempt
 def test_device_command_sprinkle_start(request):
     request_data = json.loads(request.body)
 
