@@ -2,7 +2,7 @@ import json
 from django.http import JsonResponse
 from sprinkler.mqtt import client as mqtt_client
 from sprinkler.models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
-import datetime
+from datetime import datetime, timezone, timedelta
 
 
 WATERING_SCHEDULE_PUSH_MINUTES = 360
@@ -11,6 +11,10 @@ MINUTES_IN_DAY = 1440
 
 def send_mqtt_message(topic, body) -> JsonResponse:
     # TODO: validate message
+
+    # cast body to string if needed
+    if not type(body) == str:
+        body = str(body)
     rc, mid = mqtt_client.publish(topic, body)
     return JsonResponse({'code': rc})
 
@@ -66,7 +70,7 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
     # set the interval from the schedule or the override property
     minutes_till_next_scheduled_event = interval_minutes if interval_minutes else schedule.interval_minutes
 
-    scheduled_dt = starting_at + datetime.timedelta(0, 0, 0, 0, minutes_till_next_scheduled_event)
+    scheduled_dt = starting_at + timedelta(0, 0, 0, 0, minutes_till_next_scheduled_event)
 
     # make sure the schedule's hour/minute are respected
     if schedule.hour:
@@ -75,15 +79,15 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
         scheduled_dt = scheduled_dt.replace(minute=schedule.minute)
 
     # if the new time is before the interval has elapsed, push forward 1 day
-    if scheduled_dt < starting_at + datetime.timedelta(0, 0, 0, 0, schedule.interval_minutes):
-        scheduled_dt = scheduled_dt + datetime.timedelta(0, 0, 1)
+    if scheduled_dt < starting_at + timedelta(0, 0, 0, 0, schedule.interval_minutes):
+        scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
 
-    current_dt = datetime.datetime.now()
+    current_dt = datetime.now(timezone.utc)
 
     # ensure the scheduled time is in the future.  this will heal cases where the server has been offline
     # for awhile or whatever
     while scheduled_dt < current_dt:
-        scheduled_dt = scheduled_dt + datetime.timedelta(0, 0, 1)
+        scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
 
     schedule.next_execution = scheduled_dt
 
@@ -97,7 +101,7 @@ def get_next_schd_using_interval(schedule: IOTDeviceSchedule):
     :return: datetime.datetime of the next scheduled run
     """
 
-    current_dt = datetime.datetime.now()
+    current_dt = datetime.now(timezone.utc)
     next_scheduled_dt = add_minutes_to_dt(schedule.next_execution, schedule.interval_minutes)
     while next_scheduled_dt < current_dt:
         next_scheduled_dt = add_minutes_to_dt(next_scheduled_dt, schedule.interval_minutes)
@@ -105,7 +109,7 @@ def get_next_schd_using_interval(schedule: IOTDeviceSchedule):
     return next_scheduled_dt
 
 
-def add_minutes_to_dt(dt: datetime.datetime, minutes: int) -> datetime.datetime:
+def add_minutes_to_dt(dt: datetime, minutes: int) -> datetime:
     """
     Add minutes to a datetime.datetime object
     :param dt: datetime.datetime object
@@ -113,13 +117,13 @@ def add_minutes_to_dt(dt: datetime.datetime, minutes: int) -> datetime.datetime:
     :return: new datetime.datetime object with minutes added
     """
 
-    return dt + datetime.timedelta(0, 0, 0, 0, minutes)
+    return dt + timedelta(0, 0, 0, 0, minutes)
 
 
-def build_schedule_execution(schedule: IOTDeviceSchedule, t: datetime.datetime, mqtt_response: JsonResponse) -> \
+def build_schedule_execution(schedule: IOTDeviceSchedule, t: datetime, mqtt_response: JsonResponse) -> \
         IOTDeviceScheduleExecution:
     code = json.loads(mqtt_response.content)['code']
-    schedule_execution = IOTDeviceScheduleExecution(iot_device_schedule_id=schedule.id,
+    schedule_execution = IOTDeviceScheduleExecution(iot_device_schedule_id=schedule.pk,
                                                     schedule_type=schedule.schedule_type,
                                                     start_time=t,
                                                     exit_code=code

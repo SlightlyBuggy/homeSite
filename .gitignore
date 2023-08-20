@@ -1,0 +1,7 @@
+*.pyc
+*.sqlite3
+*.svg
+static/admin/css/*
+static/admin/js/*
+static/sprinkler/*.*
+.idea/

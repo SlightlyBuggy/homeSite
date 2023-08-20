@@ -1,0 +1,22 @@
+.iot-device-container {
+    border: 1px solid lightgrey;
+    border-radius: 5px;
+    padding:5px;
+}
+.iot-device-container th{
+    padding-left: 10px;
+    padding-right: 10px;
+    border-bottom: 1px solid lightgrey;
+}
+
+.iot-device-container td{
+    text-align: center;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+
+.devic-status-heading {
+    text-align: center;
+    font-size: 1.2em;
+    font-weight: bold;
+}

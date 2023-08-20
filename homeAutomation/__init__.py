@@ -1,3 +1,3 @@
-from sprinkler import mqtt
-
-mqtt.client.loop_start()
+# from sprinkler import mqtt
+#
+# mqtt.client.loop_start()

@@ -78,7 +78,7 @@ class ScheduleTypes(models.TextChoices):
 # Device-specific schedule configuration
 class IOTDeviceSchedule(BaseModel):
 
-    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
 
     schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
@@ -91,45 +91,48 @@ class IOTDeviceSchedule(BaseModel):
     interval_minutes = models.IntegerField()
 
     # this will be managed by the automation
-    next_execution = models.DateTimeField()
+    next_execution = models.DateTimeField(auto_now=False)
 
     # whether to consider this schedule
     active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.device} - {self.schedule_type}"
 
 
 # log of scheduled actions
 class IOTDeviceScheduleExecution(BaseModel):
 
-    iot_device_schedule_id = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
+    iot_device_schedule = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
 
     schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)
 
-    start_time: models.DateTimeField()
+    start_time = models.DateTimeField(auto_now=False)
     exit_code = models.IntegerField()
 
 
 # rain log
 class RainLog(BaseModel):
 
-    start_time: models.DateTimeField()
-    end_time: models.DateTimeField()
+    start_time = models.DateTimeField(auto_now=False)
+    end_time = models.DateTimeField(auto_now=False)
     total_amount_inches = models.FloatField()
 
 
 # wanted to call this WaterLog (ha) but that was too confusing
 class SprinklerLog(BaseModel):
-    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
-    start_time: models.DateTimeField()
-    end_time: models.DateTimeField()
+    start_time = models.DateTimeField(auto_now=False)
+    end_time = models.DateTimeField(auto_now=False)
     water_qty_at_start_gallons = models.FloatField()
     water_level_at_end_gallons = models.FloatField()
 
 
 # device status
 class DeviceStatusLog(BaseModel):
-    device_id = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
     supply_voltage = models.FloatField()
     water_level_inches = models.FloatField()

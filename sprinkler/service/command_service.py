@@ -20,11 +20,11 @@ def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
         return
 
     status_body = {
-        'device_id': device.id,
-        'message_body': None
+        'device_id': device.device_id,
+        'command': mqtt.COMMAND_STATUS
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_STATUS_TOPIC, status_body)
+    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, status_body)
 
     # set the next scheduled time
     schedule.next_execution = util.get_next_schd_using_interval(schedule)
@@ -48,7 +48,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
 
     current_dt = datetime.datetime.now()
     # get the end time and status of watering event (rain, sprinkler, etc
-    last_water_end, watering_in_progress = util.get_last_watering_and_status(device_id=device.id)
+    last_water_end, watering_in_progress = util.get_last_watering_and_status(device_id=device.device_id)
 
     # if a watering event is in progress, recalculate the next_execution starting now
     if watering_in_progress:
@@ -64,7 +64,8 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
 
     # if we've gotten here, we need to command the device to start watering
     water_body = {
-        'device_id': device.id,
+        'device_id': device.device_id,
+        'command': mqtt.COMMAND_SPRINKLE_START,
         'message_body': {
             'watering_length_minutes': device.watering_length_minutes,
             'watering_wait_minutes': device.watering_wait_minutes,
@@ -72,7 +73,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
         }
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_SPRINKLE_START_TOPIC, water_body)
+    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, water_body)
 
     # push water schedule ahead by one day to allow sprinkling to occur.  if sprinkling happens,
     # the logic above will push out the schedule.  if does not, it will be retried on that day
