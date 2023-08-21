@@ -68,6 +68,12 @@ class IOTDevice(Device):
     ipv4_address = models.CharField(max_length=15)
     port = models.IntegerField()
 
+    def get_latest_status(self):
+        try:
+            return self.devicestatuslog_set.all().order_by('-created')[0]
+        except IndexError:
+            pass
+
 
 # types of schedules
 class ScheduleTypes(models.TextChoices):

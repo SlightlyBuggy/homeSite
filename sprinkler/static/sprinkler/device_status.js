@@ -16,22 +16,22 @@ $(document).on('click', 'button', function() {
     {
         case 'status':
             console.log("status request")
-            request_url = "test_device_command_status"
+            request_url = "api/status"
             post_data['command'] = 'status'
             break;
         case 'sprinkle-1-min':
             console.log("sprinkle 1 min")
-            request_url = "test_device_command_sprinkle_start"
+            request_url = "api/sprinkle_start"
             post_data['command'] = 'sprinkle_start'
             post_data['watering_length_minutes'] = 1;
             break;
         case 'sprinkle-on':
             console.log("Sprinkle on")
-            request_url = "sprinkle_on"
+            request_url = "api/sprinkle_on"
             break;
         case 'sprinkle-off':
             console.log("Sprinkle off")
-            request_url = "sprinkle_off"
+            request_url = "api/sprinkle_off"
             break;
         default:
             console.log(`Unknown request type ${request_type}`)
