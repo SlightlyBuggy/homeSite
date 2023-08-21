@@ -1,7 +1,7 @@
 import util.automation_utils as util
 import sprinkler.mqtt as mqtt
 from sprinkler.models import IOTDeviceSchedule, IOTDevice
-import datetime
+from datetime import datetime, timezone
 
 
 def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
@@ -14,7 +14,7 @@ def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     :return:
     """
 
-    current_dt = datetime.datetime.now()
+    current_dt = datetime.now(timezone.utc)
     if not schedule.interval_minutes:
         print("Unable to process schedule.  Missing interval_minutes")
         return
@@ -46,7 +46,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     :return:
     """
 
-    current_dt = datetime.datetime.now()
+    current_dt = datetime.now(timezone.utc)
     # get the end time and status of watering event (rain, sprinkler, etc
     last_water_end, watering_in_progress = util.get_last_watering_and_status(device_id=device.device_id)
 

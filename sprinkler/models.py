@@ -119,6 +119,12 @@ class RainLog(BaseModel):
     end_time = models.DateTimeField(auto_now=False)
     total_amount_inches = models.FloatField()
 
+    def __str__(self):
+        if self.end_time:
+            return f"{self.start_time.strftime('%Y-%m-%d %H:%M:%S')} - {self.end_time.strftime('%Y-%m-%d %H:%M:%S')}.  " \
+                   f"Total: {self.total_amount_inches}"
+        return f"{self.start_time} - ongoing"
+
 
 # wanted to call this WaterLog (ha) but that was too confusing
 class SprinklerLog(BaseModel):
@@ -129,6 +135,9 @@ class SprinklerLog(BaseModel):
     water_qty_at_start_gallons = models.FloatField()
     water_level_at_end_gallons = models.FloatField()
 
+    def __str__(self):
+        return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 # device status
 class DeviceStatusLog(BaseModel):
@@ -136,6 +145,9 @@ class DeviceStatusLog(BaseModel):
 
     supply_voltage = models.FloatField()
     water_level_inches = models.FloatField()
+
+    def __str__(self):
+        return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')}"
 
 
 # store global settings - not sure what exactly, but it might be useful
