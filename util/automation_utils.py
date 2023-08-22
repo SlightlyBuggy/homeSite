@@ -1,22 +1,12 @@
 import json
 from django.http import JsonResponse
-from sprinkler.mqtt import client as mqtt_client
 from sprinkler.models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
 from datetime import datetime, timezone, timedelta
 
 
 WATERING_SCHEDULE_PUSH_MINUTES = 360
 MINUTES_IN_DAY = 1440
-
-
-def send_mqtt_message(topic, body) -> JsonResponse:
-    # TODO: validate message
-
-    # cast body to string if needed
-    if not type(body) == str:
-        body = str(body)
-    rc, mid = mqtt_client.publish(topic, body)
-    return JsonResponse({'code': rc})
+PSI_PER_PASCAL = 0.000145038
 
 
 def get_last_watering_and_status(device_id) -> tuple[any, bool]:
@@ -129,3 +119,20 @@ def build_schedule_execution(schedule: IOTDeviceSchedule, t: datetime, mqtt_resp
                                                     exit_code=code
                                                     )
     return schedule_execution
+
+
+def get_voltage_from_ticks_and_cal(input_ticks: int, cal_low_ticks: int, cal_low_voltage: float,
+                                   cal_high_ticks: int, cal_high_voltage: float) -> float:
+    """
+    Do a linear interpolation using cal data and input analog arduino ticks to get voltage
+    :param input_ticks: raw a/d ticks from arduino
+    :param cal_low_ticks: a/d ticks that correspond to cal_low_voltage
+    :param cal_low_voltage: low voltage calibration point
+    :param cal_high_ticks: a/d ticks that correspond to cal_high_voltage
+    :param cal_high_voltage: high voltage calibration point
+    :return:
+    """
+
+    voltage = (input_ticks - cal_low_ticks)*(cal_high_voltage - cal_low_voltage)/(cal_high_ticks - cal_low_ticks) + cal_low_voltage
+
+    return voltage

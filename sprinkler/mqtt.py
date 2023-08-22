@@ -2,6 +2,8 @@ import paho.mqtt.client as mqtt
 import json
 from homeAutomation import settings
 from sprinkler.models import DeviceStatusLog, IOTDevice
+from util.automation_utils import get_voltage_from_ticks_and_cal, PSI_PER_PASCAL
+from django.http import JsonResponse
 
 # server to device topic
 COMMAND_TOPIC = 'command'
@@ -26,6 +28,7 @@ def on_message(mqtt_client, userdata, msg):
 def on_device_message(mqtt_client, userdata, msg):
     print(f'Received device message on topic: {msg.topic} with payload: {msg.payload}')
 
+
 def on_device_status(mqtt_client, userdata, msg):
     print(f'Received device status message on topic: {msg.topic} with payload: {msg.payload}')
     message_contents = json.loads(msg.payload)
@@ -39,14 +42,25 @@ def on_device_status(mqtt_client, userdata, msg):
     device_id = message_contents['device_id']
     status = message_contents['status']
 
-    pressure = None
+    # TODO: include pressure ticks and conversion to pressure
+    voltage_ticks = None
     voltage = None
+    water_pressure_psi = None
+
+    if 'voltage_ticks' in status:
+        voltage_ticks = status['voltage_ticks']
+        devices_with_device_id: list[IOTDevice] = IOTDevice.objects.filter(device_id=device_id)[:1]
+
+        if devices_with_device_id:
+            this_device: IOTDevice = devices_with_device_id[0]
+            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks, cal_low_ticks=this_device.cal_low_ticks,
+                                                     cal_low_voltage=this_device.cal_low_voltage,
+                                                     cal_high_ticks=this_device.cal_high_ticks,
+                                                     cal_high_voltage=this_device.cal_high_voltage)
 
     if 'pressure' in status:
-        pressure = status['pressure']
-
-    if 'voltage' in status:
-        voltage = status['voltage']
+        water_pressure_pascals = status['pressure']
+        water_pressure_psi = water_pressure_pascals*PSI_PER_PASCAL
 
     transmitting_device = IOTDevice.objects.get(device_id=device_id)
 
@@ -54,7 +68,9 @@ def on_device_status(mqtt_client, userdata, msg):
         print(f"Unable to handle device status message.  unknown device id {device_id}")
         return
 
-    new_device_status = DeviceStatusLog(device=transmitting_device, supply_voltage=voltage, water_level_inches=pressure)
+    new_device_status = DeviceStatusLog(device=transmitting_device, supply_voltage=voltage,
+                                        supply_voltage_ticks=voltage_ticks,
+                                        water_pressure_pascals=water_pressure_psi)
     new_device_status.save()
 
 
@@ -90,3 +106,13 @@ client.connect(
     port=settings.MQTT_PORT,
     keepalive=settings.MQTT_KEEPALIVE
 )
+
+
+def send_mqtt_message(topic, body) -> JsonResponse:
+    # TODO: validate message
+
+    # cast body to string if needed
+    if not type(body) == str:
+        body = str(body)
+    rc, mid = client.publish(topic, body)
+    return JsonResponse({'code': rc})

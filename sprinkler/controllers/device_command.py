@@ -1,6 +1,5 @@
 import json
 from django.views.decorators.csrf import csrf_exempt
-import util.automation_utils as util
 import sprinkler.mqtt as mqtt
 
 
@@ -12,7 +11,7 @@ def status(request):
 
     test_payload = {'device_id': device_id, 'command': mqtt.COMMAND_STATUS, 'body': {}}
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -35,7 +34,7 @@ def sprinkle_start(request):
     if 'watering_length_seconds' in request_data:
         test_payload['body']['watering_length_seconds'] = request_data['watering_length_seconds']
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -52,7 +51,7 @@ def sprinkle_on(request):
         'command': mqtt.COMMAND_SPRINKLE_ON
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -67,6 +66,6 @@ def sprinkle_off(request):
         'command': mqtt.COMMAND_SPRINKLE_OFF
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
     return mqtt_response
 

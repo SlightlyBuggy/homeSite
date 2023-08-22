@@ -24,7 +24,7 @@ def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
         'command': mqtt.COMMAND_STATUS
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, status_body)
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, status_body)
 
     # set the next scheduled time
     schedule.next_execution = util.get_next_schd_using_interval(schedule)
@@ -73,7 +73,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
         }
     }
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, water_body)
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, water_body)
 
     # push water schedule ahead by one day to allow sprinkling to occur.  if sprinkling happens,
     # the logic above will push out the schedule.  if does not, it will be retried on that day

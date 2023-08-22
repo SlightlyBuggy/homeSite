@@ -22,5 +22,3 @@ urlpatterns = [
     path('device_status', views.device_status, name='device_status'),
     path('api/', include(api_urls)),
 ]
-
-

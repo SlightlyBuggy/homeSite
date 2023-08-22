@@ -12,5 +12,5 @@ def test_device_command_status(request):
 
     test_payload = {'device_id': device_id, 'command': mqtt.COMMAND_STATUS, 'body': {}}
 
-    mqtt_response = util.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response

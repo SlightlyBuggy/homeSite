@@ -25,14 +25,14 @@ class Device(BaseModel):
     # conversion from reported sensor value to inches water
     # rather than trying to fill each barrel and calibrating, we can use a value based on the docs and test later
     # when the barrel is naturally filled up.  This assumes a constant cross-section barrel, which seems reasonable
-    sensor_val_to_inches_water_multiplier = models.FloatField()
+    sensor_val_to_inches_water_multiplier = models.FloatField(null=True)
 
     # it should just read zero, but this is just in case
     sensor_reading_at_zero = models.FloatField(default=0.0)
 
     # water storage configuration
-    num_barrels = models.IntegerField()
-    barrel_cross_sectional_area_in2 = models.FloatField()
+    num_barrels = models.IntegerField(null=True)
+    barrel_cross_sectional_area_in2 = models.FloatField(null=True)
 
     # watering configuration
     # minimum time to wait between water events before trying to water
@@ -54,6 +54,13 @@ class Device(BaseModel):
     # based on pin strapping
     # TODO: implement pin strapping in Arduino code
     device_id = models.IntegerField()
+
+    # calibration for the supply voltage reading
+    cal_low_ticks = models.IntegerField(null=True)
+    cal_low_voltage = models.FloatField(null=True)
+
+    cal_high_ticks = models.FloatField(null=True)
+    cal_high_voltage = models.FloatField(null=True)
 
     class Meta:
         abstract = True
@@ -148,9 +155,9 @@ class SprinklerLog(BaseModel):
 # device status
 class DeviceStatusLog(BaseModel):
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
-
-    supply_voltage = models.FloatField()
-    water_level_inches = models.FloatField()
+    supply_voltage_ticks = models.IntegerField(null=True)
+    supply_voltage = models.FloatField(null=True)
+    water_pressure_psi = models.FloatField(null=True)
 
     def __str__(self):
         return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')}"

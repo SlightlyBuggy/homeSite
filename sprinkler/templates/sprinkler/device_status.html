@@ -2,6 +2,7 @@
 <head>
     {% load static %}
     {% load bootstrap5 %}
+    {% load tz %}
     {% bootstrap_css %}
     {% bootstrap_javascript %}
     {% bootstrap_messages %}
@@ -18,7 +19,8 @@
     <table>
         <th>Name</th>
         <th>Device Id</th>
-        <th>Last status</th>
+        <th>Status time</th>
+        <th>Voltage</th>
         <th>Get Status Now</th>
         <th>Turn on sprinkler</th>
         <th>Turn off sprinkler</th>
@@ -27,7 +29,8 @@
             <tr>
                 <td>{{device.name}}</td>
                 <td>{{device.device_id}}</td>
-                <td>{{device.get_latest_status.created}}</td>
+                <td>{{ device.get_latest_status.created|localtime }}</td>
+                <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
                 <td><button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button></td>
                 <td><button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button></td>
                 <td><button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button></td>
