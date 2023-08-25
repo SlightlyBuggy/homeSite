@@ -13,31 +13,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
-
-<div class="device-status-heading">IOT devices</div>
-<div class="iot-device-container">
-    <table>
-        <th>Name</th>
-        <th>Device Id</th>
-        <th>Status time</th>
-        <th>Voltage</th>
-        <th>Get Status Now</th>
-        <th>Turn on sprinkler</th>
-        <th>Turn off sprinkler</th>
-        <th>Sprinkle for 1 minute now</th>
-        {% for device in all_devices %}
-            <tr>
-                <td>{{device.name}}</td>
-                <td>{{device.device_id}}</td>
-                <td>{{ device.get_latest_status.created|localtime }}</td>
-                <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
-                <td><button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button></td>
-                <td><button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button></td>
-                <td><button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button></td>
-                <td><button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button></td>
-            </tr>
-        {% endfor %}
-    </table>
+<div class="outer-container">
+    <div class="inner-container">
+        <div class="device-status-heading">IOT devices</div>
+        <div class="iot-device-container">
+            <table>
+                <th>Name</th>
+                <th>Device Id</th>
+                <th>Status time</th>
+                <th>Voltage</th>
+                <th>Get Status Now</th>
+                <th>Turn on sprinkler</th>
+                <th>Turn off sprinkler</th>
+                <th>Sprinkle for 1 minute now</th>
+                {% for device in all_devices %}
+                    <tr>
+                        <td>{{device.name}}</td>
+                        <td>{{device.device_id}}</td>
+                        <td>{{ device.get_latest_status.created|localtime }}</td>
+                        <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
+                        <td><button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button></td>
+                        <td><button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button></td>
+                        <td><button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button></td>
+                        <td><button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
 </div>
 </body>
 </html>

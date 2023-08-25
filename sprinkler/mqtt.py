@@ -70,7 +70,7 @@ def on_device_status(mqtt_client, userdata, msg):
 
     new_device_status = DeviceStatusLog(device=transmitting_device, supply_voltage=voltage,
                                         supply_voltage_ticks=voltage_ticks,
-                                        water_pressure_pascals=water_pressure_psi)
+                                        water_pressure_psi=water_pressure_psi)
     new_device_status.save()
 
 
