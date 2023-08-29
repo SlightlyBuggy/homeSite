@@ -96,10 +96,14 @@ def on_connect(mqtt_client, userdata, flags, rc):
     else:
         print('Bad connection. Code:', rc)
 
+def on_disconnect(mqtt_client, userdata, rc):
+    if rc != 0:
+        print(f"Unexpected disconnect from mqtt broker with code {rc}")
 
 client = mqtt.Client()
 client.on_connect = on_connect
 client.on_message = on_message
+client.on_disconnect = on_disconnect
 client.message_callback_add('device_status', on_device_status)
 client.message_callback_add('device_message', on_device_message)
 client.message_callback_add('sprinkle_start', on_sprinkle_start)
