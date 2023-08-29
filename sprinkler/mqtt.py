@@ -85,9 +85,13 @@ def on_sprinkle_end(mqtt_client, userdata, msg):
 def on_connect(mqtt_client, userdata, flags, rc):
     if rc == 0:
         print('Connected to mqtt server')
+        print(f"About to subscribe to {DEVICE_MESSAGE_TOPIC}")
         mqtt_client.subscribe(DEVICE_MESSAGE_TOPIC)
+        print(f"About to subscribe to {DEVICE_STATUS_TOPIC}")
         mqtt_client.subscribe(DEVICE_STATUS_TOPIC)
+        print(f"About to subscribe to {DEVICE_SPRINKLE_START_TOPIC}")
         mqtt_client.subscribe(DEVICE_SPRINKLE_START_TOPIC)
+        print(f"About to subscribe to {DEVICE_SPRINKLE_END_TOPIC}")
         mqtt_client.subscribe(DEVICE_SPRINKLE_END_TOPIC)
     else:
         print('Bad connection. Code:', rc)
