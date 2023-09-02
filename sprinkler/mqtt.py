@@ -13,6 +13,9 @@ COMMAND_STATUS = 'status'
 COMMAND_SPRINKLE_START = 'sprinkle_start'
 COMMAND_SPRINKLE_ON = 'sprinkle_on'
 COMMAND_SPRINKLE_OFF = 'sprinkle_off'
+COMMAND_SLEEP = "sleep_now"
+COMMAND_SWITCH_BROKER_DEBUG = "switch_broker_debug"
+COMMAND_SWITCH_BROKER_PROD = "switch_broker_prod"
 
 # device to server
 DEVICE_MESSAGE_TOPIC = 'device_message'

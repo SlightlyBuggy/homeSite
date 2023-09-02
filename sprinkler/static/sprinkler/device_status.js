@@ -17,12 +17,10 @@ $(document).on('click', 'button', function() {
         case 'status':
             console.log("status request")
             request_url = "api/status"
-            post_data['command'] = 'status'
             break;
         case 'sprinkle-1-min':
             console.log("sprinkle 1 min")
             request_url = "api/sprinkle_start"
-            post_data['command'] = 'sprinkle_start'
             post_data['watering_length_minutes'] = 1;
             break;
         case 'sprinkle-on':
@@ -32,6 +30,19 @@ $(document).on('click', 'button', function() {
         case 'sprinkle-off':
             console.log("Sprinkle off")
             request_url = "api/sprinkle_off"
+            break;
+        case 'sleep-1-min':
+            console.log("Sleep 1 min")
+            request_url = "api/sleep_now"
+            post_data['sleep_length_minutes'] = 1
+            break;
+        case 'switch-broker-debug':
+            console.log("Switch to debug broker")
+            request_url = "api/switch_broker_debug"
+            break;
+        case 'switch-broker-prod':
+            console.log("Switch to prod broker")
+            request_url = "api/switch_broker_prod"
             break;
         default:
             console.log(`Unknown request type ${request_type}`)

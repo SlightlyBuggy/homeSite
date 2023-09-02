@@ -25,7 +25,10 @@
                 <th>Get Status Now</th>
                 <th>Turn on sprinkler</th>
                 <th>Turn off sprinkler</th>
-                <th>Sprinkle for 1 minute now</th>
+                <th>Sprinkle for 1 min</th>
+                <th>Sleep for 1 min</th>
+                <th>Switch to debug broker</th>
+                <th>Sleep to prod broker</th>
                 {% for device in all_devices %}
                     <tr>
                         <td>{{device.name}}</td>
@@ -35,7 +38,11 @@
                         <td><button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button></td>
                         <td><button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button></td>
                         <td><button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button></td>
+                        {% comment %} TODO: rework this to sprinkle for X minutes {% endcomment %}
                         <td><button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button></td>
+                        <td><button data-request_type="sleep-1-min" data-device_id="{{device.device_id}}">Sleep for 1 min</button></td>
+                        <td><button data-request_type="switch-broker-debug" data-device_id="{{device.device_id}}">Switch to debug broker</button></td>
+                        <td><button data-request_type="switch-broker-prod" data-device_id="{{device.device_id}}">Switch to prod broker</button></td>
                     </tr>
                 {% endfor %}
             </table>
