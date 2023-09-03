@@ -84,7 +84,9 @@ def sleep_now(request):
     payload = {
         'device_id': device_id,
         'command': mqtt.COMMAND_SLEEP,
-        'sleep_length_minutes': sleep_length_minutes
+        'body': {
+            'sleep_length_minutes': str(sleep_length_minutes)
+        }
     }
 
     mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
