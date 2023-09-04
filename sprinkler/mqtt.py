@@ -90,7 +90,7 @@ def on_device_status(mqtt_client, userdata, msg):
         'device_id': device_id,
         'command': COMMAND_SLEEP,
         'body': {
-            'sleep_length_minutes': "1"
+            'sleep_length_minutes': "60"
         }
     }
 
