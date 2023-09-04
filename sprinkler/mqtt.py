@@ -31,7 +31,16 @@ def on_message(mqtt_client, userdata, msg):
 def on_device_message(mqtt_client, userdata, msg):
     print(f'Received device message on topic: {msg.topic} with payload: {msg.payload}')
 
+# TODO: need to do something where device is put to sleep unless there is a pending task, then have the device always
+# TODO: report status when it wakes and periodically while awake.  when status is received, server should decide what
+# TODO: to command device by calling "get pending task" or similar, which returns zero or one task for the device
+# TODO: this requires a rethink of how the server interacts with devices, and should assume devices are not connected
+# TODO: this ensures devices are always using the minimum power
 
+# TODO: the "execute scheduled tasks" may need to be pared down to checking the precip report
+
+# TODO: also consider device status body, like 'just woke up' and 'just finished sprinkling' and 'pump commanded on',
+# TODO: etc.
 def on_device_status(mqtt_client, userdata, msg):
     print(f'Received device status message on topic: {msg.topic} with payload: {msg.payload}')
     message_contents = json.loads(msg.payload)
@@ -75,6 +84,17 @@ def on_device_status(mqtt_client, userdata, msg):
                                         supply_voltage_ticks=voltage_ticks,
                                         water_pressure_psi=water_pressure_psi)
     new_device_status.save()
+
+    # TODO: rework this.  This is just test code to get the device into a low power loop with minimum effort
+    payload = {
+        'device_id': device_id,
+        'command': COMMAND_SLEEP,
+        'body': {
+            'sleep_length_minutes': "1"
+        }
+    }
+
+    send_mqtt_message(COMMAND_TOPIC, str(payload))
 
 
 def on_sprinkle_start(mqtt_client, userdata, msg):
