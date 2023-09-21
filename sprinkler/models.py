@@ -92,8 +92,6 @@ class ScheduleTypes(models.TextChoices):
 
 
 # Device-specific schedule configuration
-# TODO: need to either handle watering in the schedule system and deprecate watering stuff in the device, or deprecate
-# the schedule piece of it
 class IOTDeviceSchedule(BaseModel):
 
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')

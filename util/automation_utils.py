@@ -1,6 +1,6 @@
 import json
 from django.http import JsonResponse
-from sprinkler.models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution
+from sprinkler.models import RainLog, SprinklerLog, IOTDeviceSchedule, IOTDeviceScheduleExecution, IOTDevice
 from datetime import datetime, timezone, timedelta
 
 
@@ -68,8 +68,15 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
     if schedule.minute:
         scheduled_dt = scheduled_dt.replace(minute=schedule.minute)
 
+    # if there's no interval and no minute specified, set to x:00
+    if not schedule.minute and not schedule.interval_minutes:
+        scheduled_dt = scheduled_dt.replace(minute=0)
+
+    scheduled_dt = scheduled_dt.replace(second=0)
+    scheduled_dt = scheduled_dt.replace(microsecond=0)
+
     # if the new time is before the interval has elapsed, push forward 1 day
-    if scheduled_dt < starting_at + timedelta(0, 0, 0, 0, schedule.interval_minutes):
+    if scheduled_dt < starting_at + timedelta(0, 0, 0, 0, minutes_till_next_scheduled_event):
         scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
 
     current_dt = datetime.now(timezone.utc)
@@ -136,3 +143,11 @@ def get_voltage_from_ticks_and_cal(input_ticks: int, cal_low_ticks: int, cal_low
     voltage = (input_ticks - cal_low_ticks)*(cal_high_voltage - cal_low_voltage)/(cal_high_ticks - cal_low_ticks) + cal_low_voltage
 
     return voltage
+
+
+def build_sprinkle_log(device: IOTDevice, start_time, end_time, water_qty_at_start_gallons,
+                       water_qty_at_end_gallons) -> SprinklerLog:
+    new_sprinkle_log = SprinklerLog(device=device, start_time=start_time, end_time=end_time,
+                                    water_qty_at_start_gallons=water_qty_at_start_gallons,
+                                    water_level_at_end_gallons=water_qty_at_end_gallons)
+    return new_sprinkle_log

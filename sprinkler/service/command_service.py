@@ -52,13 +52,17 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
 
     # if a watering event is in progress, recalculate the next_execution starting now
     if watering_in_progress:
-        schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt)
+        schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt,
+                                                                      interval_minutes=
+                                                                      device.minimum_water_interval_hours*60)
         schedule.save()
         return
 
     # if we have a past water event, calc the next needed watering based on the end of that event
     if last_water_end:
-        schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end)
+        schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
+                                                                      interval_minutes=
+                                                                      device.minimum_water_interval_hours*60)
         schedule.save()
         return
 
@@ -79,10 +83,19 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     # the logic above will push out the schedule.  if does not, it will be retried on that day
     # this allows things like manual filling of barrels or water transfer to work
     schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt,
-                                                                  interval_minutes=util.MINUTES_IN_DAY)
+                                                                  interval_minutes=
+                                                                  device.minimum_water_interval_hours*60)
     schedule.save()
 
     # create and save the schedule_execution object
     schedule_execution = util.build_schedule_execution(schedule, current_dt, mqtt_response)
     schedule_execution.save()
+
+    # create and save the sprinkler log object
+    # TODO: do this in response to a message from the device?
+    # TODO: fix inputs
+    sprinkle_log = util.build_sprinkle_log(device=device, start_time=current_dt, end_time=current_dt,
+                                           water_qty_at_start_gallons=0, water_qty_at_end_gallons=0)
+    sprinkle_log.save()
+
     return
