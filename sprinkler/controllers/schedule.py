@@ -4,10 +4,11 @@ from sprinkler.service import command_service
 from django.http import JsonResponse
 
 
-def execute_scheduled_tasks(request):
+# TODO: should the device status be part of the scheduling system?
+def ping_devices_for_status(request):
     """
-    This endpoint looks at the list of active IOTDeviceSchedules and determines what to do with each.  A
-    IOTDeviceScheduleExecution is created whenever scheduled tasks are executed
+    This endpoint fetches device statusus for each device.  This triggers scheduled task execution when each device
+    reports in
     :param request:
     :return: None
     """
@@ -29,10 +30,6 @@ def execute_scheduled_tasks(request):
             match active_schedule.schedule_type:
                 case ScheduleTypes.GET_DEVICE_STATUS:
                     command_service.handle_status_command(schedule=active_schedule, device=device)
-                    scheduled_tasks_executed += 1
-
-                case ScheduleTypes.SPRINKLE:
-                    command_service.handle_sprinkle_command(schedule=active_schedule, device=device)
                     scheduled_tasks_executed += 1
 
                 case _:

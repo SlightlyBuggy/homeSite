@@ -4,6 +4,8 @@ from homeAutomation import settings
 from sprinkler.models import DeviceStatusLog, IOTDevice
 from util.automation_utils import get_voltage_from_ticks_and_cal, PSI_PER_PASCAL
 from django.http import JsonResponse
+from sprinkler.service.device_service import should_device_be_awake
+from sprinkler.service.schedule_service import execute_scheduled_tasks
 
 # server to device topic
 COMMAND_TOPIC = 'command'
@@ -85,16 +87,26 @@ def on_device_status(mqtt_client, userdata, msg):
                                         water_pressure_psi=water_pressure_psi)
     new_device_status.save()
 
-    # TODO: rework this.  This is just test code to get the device into a low power loop with minimum effort
-    payload = {
-        'device_id': device_id,
-        'command': COMMAND_SLEEP,
-        'body': {
-            'sleep_length_minutes': "60"
-        }
-    }
+    # TODO: should this use the scheduling system?
+    device_should_be_awake = should_device_be_awake(device=transmitting_device)
 
-    send_mqtt_message(COMMAND_TOPIC, str(payload))
+    # put the device to sleep if it needs to be asleep
+    if not device_should_be_awake:
+
+        payload = {
+            'device_id': device_id,
+            'command': COMMAND_SLEEP,
+            'body': {
+                'sleep_length_minutes': "60" # TODO: should this be hardcoded?
+            }
+        }
+
+        send_mqtt_message(COMMAND_TOPIC, str(payload))
+
+        return
+
+    # otherwise, execute any pending tasks for the device
+    execute_scheduled_tasks(device=transmitting_device)
 
 
 def on_sprinkle_start(mqtt_client, userdata, msg):

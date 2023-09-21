@@ -52,7 +52,6 @@ class Device(BaseModel):
     watering_repetitions = models.IntegerField()
 
     # based on pin strapping
-    # TODO: implement pin strapping in Arduino code
     device_id = models.IntegerField()
 
     # calibration for the supply voltage reading
@@ -62,6 +61,10 @@ class Device(BaseModel):
     cal_high_ticks = models.FloatField(null=True)
     cal_high_voltage = models.FloatField(null=True)
 
+    # sleep/awake time
+    time_awake_start_hour_utc = models.IntegerField(null=True)
+    time_awake_stop_hour_utc = models.IntegerField(null=True)
+
     class Meta:
         abstract = True
 
@@ -70,7 +73,7 @@ class Device(BaseModel):
 class IOTDevice(Device):
 
     def __str__(self):
-        return self.name
+        return f"{self.device_id} - {self.name}"
 
     ipv4_address = models.CharField(max_length=15)
     port = models.IntegerField()
@@ -89,6 +92,8 @@ class ScheduleTypes(models.TextChoices):
 
 
 # Device-specific schedule configuration
+# TODO: need to either handle watering in the schedule system and deprecate watering stuff in the device, or deprecate
+# the schedule piece of it
 class IOTDeviceSchedule(BaseModel):
 
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
