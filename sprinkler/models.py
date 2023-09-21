@@ -1,4 +1,5 @@
 from django.db import models
+from datetime import datetime, timezone
 
 
 # base class that handles created/edited fields
@@ -84,6 +85,24 @@ class IOTDevice(Device):
         except IndexError:
             pass
 
+    # TODO: need to do a more robust check for offline/offline
+    def should_be_awake(self):
+        online_status = "Online"
+        offline_status = "Offline"
+        if self.time_awake_stop_hour_utc == self.time_awake_stop_hour_utc:
+            return online_status
+
+        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
+                                                            microsecond=0)
+        dt_awake_end = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
+                                                          microsecond=0)
+
+        current_dt = datetime.now(timezone.utc)
+
+        if dt_awake_start < current_dt < dt_awake_end:
+            return online_status
+
+        return offline_status
 
 # types of schedules
 class ScheduleTypes(models.TextChoices):

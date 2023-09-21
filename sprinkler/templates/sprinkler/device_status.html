@@ -20,29 +20,27 @@
             <table>
                 <th>Name</th>
                 <th>Device Id</th>
+                <th>Status</th>
                 <th>Status time</th>
                 <th>Voltage</th>
-                <th>Get Status Now</th>
-                <th>Turn on sprinkler</th>
-                <th>Turn off sprinkler</th>
-                <th>Sprinkle for 1 min</th>
-                <th>Sleep for 1 min</th>
-                <th>Switch to debug broker</th>
-                <th>Sleep to prod broker</th>
+                <th>Commands</th>
                 {% for device in all_devices %}
                     <tr>
                         <td>{{device.name}}</td>
                         <td>{{device.device_id}}</td>
-                        <td>{{ device.get_latest_status.created|localtime }}</td>
+                        <td>{{device.should_be_awake}}</td>
+                        <td>{{device.get_latest_status.created|localtime }}</td>
                         <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
-                        <td><button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button></td>
-                        <td><button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button></td>
-                        <td><button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button></td>
-                        {% comment %} TODO: rework this to sprinkle for X minutes {% endcomment %}
-                        <td><button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button></td>
-                        <td><button data-request_type="sleep-1-min" data-device_id="{{device.device_id}}">Sleep for 1 min</button></td>
-                        <td><button data-request_type="switch-broker-debug" data-device_id="{{device.device_id}}">Switch to debug broker</button></td>
-                        <td><button data-request_type="switch-broker-prod" data-device_id="{{device.device_id}}">Switch to prod broker</button></td>
+                        <td>
+                            <button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button>
+                            <button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button>
+                            <button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button>
+                            {% comment %} TODO: rework this to sprinkle for X minutes {% endcomment %}
+                            <button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button>
+                            <button data-request_type="sleep-1-min" data-device_id="{{device.device_id}}">Sleep for 1 min</button>
+                            <button data-request_type="switch-broker-debug" data-device_id="{{device.device_id}}">Switch to debug broker</button>
+                            <button data-request_type="switch-broker-prod" data-device_id="{{device.device_id}}">Switch to prod broker</button>
+                        </td>
                     </tr>
                 {% endfor %}
             </table>
