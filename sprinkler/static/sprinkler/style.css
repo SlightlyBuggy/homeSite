@@ -32,3 +32,17 @@
     font-size: 1.2em;
     font-weight: bold;
 }
+
+.device-status-offline {
+    background: darkred;
+    font-weight: bold;
+    color: white;
+    padding: 5px;
+}
+
+.device-status-online {
+    background: darkgreen;
+    font-weight: bold;
+    color: white;
+    padding: 5px;
+}

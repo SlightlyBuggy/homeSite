@@ -88,7 +88,7 @@ def on_device_status(mqtt_client, userdata, msg):
     new_device_status.save()
 
     # TODO: should this use the scheduling system?
-    device_should_be_awake = should_device_be_awake(device=transmitting_device)
+    device_should_be_awake = transmitting_device.should_be_awake()
 
     # put the device to sleep if it needs to be asleep
     if not device_should_be_awake:

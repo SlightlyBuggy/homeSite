@@ -1,6 +1,6 @@
 from sprinkler.models import IOTDeviceSchedule, ScheduleTypes, IOTDevice
 from datetime import datetime, timezone
-from sprinkler.service import command_service, device_service
+from sprinkler.service import command_service
 from django.http import JsonResponse
 
 
@@ -29,7 +29,7 @@ def ping_devices_for_status(request):
             # handle each schedule type
             match active_schedule.schedule_type:
                 case ScheduleTypes.GET_DEVICE_STATUS:
-                    if device_service.should_device_be_awake(device):
+                    if device.should_be_awake():
                         command_service.handle_status_command(schedule=active_schedule, device=device)
                         scheduled_tasks_executed += 1
 

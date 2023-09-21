@@ -28,7 +28,13 @@
                     <tr>
                         <td>{{device.name}}</td>
                         <td>{{device.device_id}}</td>
-                        <td>{{device.should_be_awake}}</td>
+                        <td>
+                            {% if device.should_be_awake %}
+                                <div class="device-status-online">Online</div>
+                            {% else %}
+                                <div class="device-status-offline">Asleep/Offline</div>
+                            {% endif %}
+                        </td>
                         <td>{{device.get_latest_status.created|localtime }}</td>
                         <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
                         <td>
