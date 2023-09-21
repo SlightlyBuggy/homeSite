@@ -90,7 +90,7 @@ class IOTDevice(Device):
         if self.time_awake_start_hour_utc == self.time_awake_stop_hour_utc:
             return True
 
-        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
+        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_start_hour_utc, minute=0, second=0,
                                                             microsecond=0)
         dt_awake_end = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
                                                           microsecond=0)

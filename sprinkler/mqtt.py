@@ -97,7 +97,7 @@ def on_device_status(mqtt_client, userdata, msg):
             'device_id': device_id,
             'command': COMMAND_SLEEP,
             'body': {
-                'sleep_length_minutes': "60" # TODO: should this be hardcoded?
+                'sleep_length_minutes': "60" # TODO: this should vary so device wakes up right at start of wake window
             }
         }
 
