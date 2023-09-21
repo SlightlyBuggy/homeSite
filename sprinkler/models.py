@@ -104,6 +104,7 @@ class IOTDevice(Device):
 
         return offline_status
 
+
 # types of schedules
 class ScheduleTypes(models.TextChoices):
     SPRINKLE = 'sprinkle'

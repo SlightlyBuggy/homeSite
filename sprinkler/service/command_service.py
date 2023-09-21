@@ -70,10 +70,10 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     water_body = {
         'device_id': device.device_id,
         'command': mqtt.COMMAND_SPRINKLE_START,
-        'message_body': {
-            'watering_length_minutes': device.watering_length_minutes,
-            'watering_wait_minutes': device.watering_wait_minutes,
-            'watering_repetitions': device.watering_repetitions,
+        'body': {
+            'watering_length_minutes': str(device.watering_length_minutes),
+            'watering_wait_minutes': str(device.watering_wait_minutes),
+            'watering_repetitions': str(device.watering_repetitions),
         }
     }
 
