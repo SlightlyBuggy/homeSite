@@ -23,6 +23,13 @@ $(document).on('click', 'button', function() {
             request_url = "api/sprinkle_start"
             post_data['watering_length_minutes'] = 1;
             break;
+        case 'sprinkle-cycle':
+            console.log("sprinkle 1 min")
+            request_url = "api/sprinkle_start"
+            post_data['watering_length_minutes'] = 1;
+            post_data['watering_wait_minutes'] = 1;
+            post_data['watering_repetitions'] = 3;
+            break;
         case 'sprinkle-on':
             console.log("Sprinkle on")
             request_url = "api/sprinkle_on"

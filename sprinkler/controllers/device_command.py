@@ -37,6 +37,12 @@ def sprinkle_start(request):
     if 'watering_length_seconds' in request_data:
         test_payload['body']['watering_length_seconds'] = request_data['watering_length_seconds']
 
+    if 'watering_wait_minutes' in request_data:
+        test_payload['body']['watering_wait_minutes'] = request_data['watering_wait_minutes']
+
+    if 'watering_repetitions' in request_data:
+        test_payload['body']['watering_repetitions'] = request_data['watering_repetitions']
+
     mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
