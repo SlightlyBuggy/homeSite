@@ -28,12 +28,12 @@ def get_last_watering_and_status(device_id) -> tuple[any, bool]:
     last_sprinkler_or_rain_end = None
 
     # extract end of last event and current status for both the rain and water logs
-    if len(last_rain_log) > 0:
+    if last_rain_log:
         last_rain: RainLog = last_rain_log[0]
         currently_raining = last_rain.start_time and not last_rain.end_time
         last_rain_end = last_rain.end_time
 
-    if len(last_sprinkler_log) > 0:
+    if last_sprinkler_log:
         last_watering: SprinklerLog = last_sprinkler_log[0]
         currently_sprinkling = last_watering.start_time and not last_watering.end_time
         last_sprinkler_end = last_watering.end_time

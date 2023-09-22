@@ -3,8 +3,14 @@ from django.http import JsonResponse
 
 
 def get_precip_observations(request):
-    precip_observations = weather_service.get_precip_observations(test=True)
-    print("Fetched test precipitation report")
-    print(precip_observations)
+    """
+    Fetch precip observations from weather data source and store in the db
+    :param request:
+    :return: JsonResponse with precip events
+    """
+    precip_observations = weather_service.record_precip_observations(test=False)
 
-    return JsonResponse({'precip_events': precip_observations.precip_events})
+    precip_events = []
+    if precip_observations:
+        precip_events = [vars(item) for item in precip_observations.precip_events]
+    return JsonResponse({'precip_events': precip_events})

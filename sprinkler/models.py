@@ -149,14 +149,14 @@ class IOTDeviceScheduleExecution(BaseModel):
 # rain log
 class RainLog(BaseModel):
 
-    start_time = models.DateTimeField(auto_now=False)
-    end_time = models.DateTimeField(auto_now=False)
-    total_amount_inches = models.FloatField()
+    start_time = models.DateTimeField(auto_now=False, null=True)
+    end_time = models.DateTimeField(auto_now=False, null=True)
+    total_amount_inches = models.FloatField(null=True)
 
     def __str__(self):
         if self.end_time:
             return f"{self.start_time.strftime('%Y-%m-%d %H:%M:%S')} - {self.end_time.strftime('%Y-%m-%d %H:%M:%S')}.  " \
-                   f"Total: {self.total_amount_inches}"
+                   f"Total: {self.total_amount_inches} inches"
         return f"{self.start_time} - ongoing"
 
 
@@ -181,7 +181,8 @@ class DeviceStatusLog(BaseModel):
     water_pressure_psi = models.FloatField(null=True)
 
     def __str__(self):
-        return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')}"
+        return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')} | {self.supply_voltage} V | " \
+               f"{self.water_pressure_psi} PSI"
 
 
 # store global settings - not sure what exactly, but it might be useful

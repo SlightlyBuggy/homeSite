@@ -1,12 +1,20 @@
 import copy
 
 
+class PrecipEvent:
+
+    def __init__(self, start=None, end=None, total_mm=None):
+        self.start = start
+        self.end = end
+        self.total_mm = total_mm
+
+
 class PrecipObservations:
 
     def __init__(self, raw_data):
 
         self.raw_data = raw_data
-        self.precip_events = []
+        self.precip_events: list[PrecipEvent] = []
 
         self.build_precip_events()
 
@@ -20,7 +28,6 @@ class PrecipObservations:
         # an end time
 
         precip_prior_observation = 0
-        precip_record_template = {'start': None, 'end': None, 'total_mm': 0}
 
         for idx, observation in enumerate(precip_observations):
             precip_this_observation = observation['properties']['precipitationLastHour']['value']
@@ -29,21 +36,20 @@ class PrecipObservations:
             # detect falling edge (end of precip event)
             if precip_this_observation and not precip_prior_observation:
 
-                precip_record = copy.deepcopy(precip_record_template)
-                precip_record['total_mm'] = precip_this_observation
+                precip_record = PrecipEvent(total_mm=precip_this_observation)
 
                 # if this is the first index, this could be an ongoing precip event, so we don't want an end
                 if idx != 0:
-                    precip_record['end'] = timestamp
+                    precip_record.end = timestamp
 
                 self.precip_events.append(precip_record)
 
             # detect continuing precip event
             if precip_this_observation and precip_prior_observation:
-                self.precip_events[-1]['total_mm'] += precip_this_observation
+                self.precip_events[-1].total_mm += precip_this_observation
 
             # detect rising edge (start of precip event)
             if not precip_this_observation and precip_prior_observation:
-                self.precip_events[-1]['start'] = timestamp
+                self.precip_events[-1].start = timestamp
 
             precip_prior_observation = precip_this_observation
