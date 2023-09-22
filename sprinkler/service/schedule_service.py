@@ -28,15 +28,11 @@ def execute_scheduled_tasks(device: IOTDevice):
 
             # handle each schedule type
             match active_schedule.schedule_type:
-                # case ScheduleTypes.GET_DEVICE_STATUS:
-                #     command_service.handle_status_command(schedule=active_schedule, device=device)
-                #     scheduled_tasks_executed += 1
-
                 case ScheduleTypes.SPRINKLE:
                     command_service.handle_sprinkle_command(schedule=active_schedule, device=device)
                     scheduled_tasks_executed += 1
 
                 case _:
-                    print(f"Unhandled schedule type {active_schedule.schedule_type}")
+                    pass
     print(f"{current_dt}: Executed {scheduled_tasks_executed} tasks")
     return JsonResponse({'tasks executed': scheduled_tasks_executed})

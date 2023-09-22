@@ -34,6 +34,6 @@ def ping_devices_for_status(request):
                         scheduled_tasks_executed += 1
 
                 case _:
-                    print(f"Unhandled schedule type {active_schedule.schedule_type}")
-    print(f"{current_dt}: Executed {scheduled_tasks_executed} tasks")
+                    pass
+
     return JsonResponse({'tasks executed': scheduled_tasks_executed})
