@@ -145,6 +145,14 @@ class IOTDeviceScheduleExecution(BaseModel):
     start_time = models.DateTimeField(auto_now=False)
     exit_code = models.IntegerField()
 
+    def __str__(self):
+
+        return "{device_id} - {device_name} | {schedule_type} | {exec_time}".format(
+            device_id=self.iot_device_schedule.device.device_id,
+            device_name=self.iot_device_schedule.device.name,
+            schedule_type=self.schedule_type,
+            exec_time=self.start_time)
+
 
 # rain log
 class RainLog(BaseModel):
@@ -155,8 +163,11 @@ class RainLog(BaseModel):
 
     def __str__(self):
         if self.end_time:
-            return f"{self.start_time.strftime('%Y-%m-%d %H:%M:%S')} - {self.end_time.strftime('%Y-%m-%d %H:%M:%S')}.  " \
-                   f"Total: {self.total_amount_inches} inches"
+
+            return "{start} - {end}; Total: {total:.2f} inches".format(
+                start=self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
+                end=self.end_time.strftime('%Y-%m-%d %H:%M:%S'),
+                total=self.total_amount_inches)
         return f"{self.start_time} - ongoing"
 
 

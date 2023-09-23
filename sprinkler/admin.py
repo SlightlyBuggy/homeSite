@@ -10,3 +10,14 @@ admin.site.register(RainLog)
 admin.site.register(SprinklerLog)
 admin.site.register(DeviceStatusLog)
 admin.site.register(Setting)
+
+
+class RainLogAdmin(admin.ModelAdmin):
+
+    list_display = 'start_time'
+
+
+class IOTDeviceAdmin(admin.ModelAdmin):
+
+    list_display = 'device_id'
+
