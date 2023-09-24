@@ -162,13 +162,17 @@ class RainLog(BaseModel):
     total_amount_inches = models.FloatField(null=True)
 
     def __str__(self):
-        if self.end_time:
-
+        
+        if self.end_time and self.start_time:
             return "{start} - {end}; Total: {total:.2f} inches".format(
                 start=self.start_time.strftime('%Y-%m-%d %H:%M:%S'),
                 end=self.end_time.strftime('%Y-%m-%d %H:%M:%S'),
                 total=self.total_amount_inches)
-        return f"{self.start_time} - ongoing"
+
+        if self.start_time:
+            return f"{self.start_time} - ongoing"
+
+        return "No start time"
 
 
 # wanted to call this WaterLog (ha) but that was too confusing
