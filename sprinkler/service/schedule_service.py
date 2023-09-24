@@ -2,11 +2,9 @@ from sprinkler.models import IOTDeviceSchedule, ScheduleTypes, IOTDevice
 from datetime import datetime, timezone
 from sprinkler.service import command_service
 from django.http import JsonResponse
+import util.automation_utils as util
 
 
-# TODO: consider how to best ensure devices actually get the message.  If there's just a scheduling system, a device might
-# be asleep, which is why this is being called when a device checks in.  Perhaps the only thing handled by the schedule
-# endpoint should be the status ping
 def execute_scheduled_tasks(device: IOTDevice):
     """
     Execute scheduled tasks for a particular device
@@ -36,3 +34,29 @@ def execute_scheduled_tasks(device: IOTDevice):
                     pass
     print(f"{current_dt}: Executed {scheduled_tasks_executed} tasks")
     return JsonResponse({'tasks executed': scheduled_tasks_executed})
+
+
+def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevice):
+
+    current_dt = datetime.now(timezone.utc)
+    # get the end time and status of watering event (rain, sprinkler, etc
+    last_water_end, watering_in_progress = util.get_last_watering_and_status(device_id=device.device_id)
+
+    # if a watering event is in progress, recalculate the next_execution starting now
+    if watering_in_progress:
+        schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt,
+                                                                      interval_minutes=
+                                                                      device.minimum_water_interval_hours*60)
+        schedule.save()
+        return
+
+    # we should ensure the next execuction is after the last water event + scheudle interval
+    if last_water_end:
+        tentative_next_exeuction = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
+                                                                       interval_minutes=
+                                                                       device.minimum_water_interval_hours*60)
+        if tentative_next_exeuction > schedule.next_execution:
+            schedule.next_execution = tentative_next_exeuction
+            schedule.save()
+
+        return

@@ -86,8 +86,6 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
     while scheduled_dt < current_dt:
         scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
 
-    schedule.next_execution = scheduled_dt
-
     return scheduled_dt
 
 
