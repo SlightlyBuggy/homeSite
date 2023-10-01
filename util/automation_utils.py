@@ -18,7 +18,8 @@ def get_last_watering_and_status(device_id) -> tuple[any, bool]:
     """
 
     last_rain_log: list[RainLog] = RainLog.objects.all().order_by('-start_time')[:1]
-    last_sprinkler_log: list[SprinklerLog] = SprinklerLog.objects.filter(device_id=device_id).order_by('-start_time')[:1]
+    last_sprinkler_log: list[SprinklerLog] = \
+        SprinklerLog.objects.filter(device_id=device_id).order_by('-start_time')[:1]
 
     currently_raining = False
     currently_sprinkling = False
@@ -44,7 +45,8 @@ def get_last_watering_and_status(device_id) -> tuple[any, bool]:
 
     # if that didn't work, set it to whatever value isn't None
     if not last_sprinkler_or_rain_end:
-        last_sprinkler_or_rain_end = last_rain_end if last_rain_end else last_sprinkler_end if last_sprinkler_end else None
+        last_sprinkler_or_rain_end = last_rain_end if last_rain_end else last_sprinkler_end if \
+            last_sprinkler_end else None
 
     return last_sprinkler_or_rain_end, currently_raining or currently_sprinkling
 
@@ -138,7 +140,8 @@ def get_voltage_from_ticks_and_cal(input_ticks: int, cal_low_ticks: int, cal_low
     :return:
     """
 
-    voltage = (input_ticks - cal_low_ticks)*(cal_high_voltage - cal_low_voltage)/(cal_high_ticks - cal_low_ticks) + cal_low_voltage
+    voltage = (input_ticks - cal_low_ticks)*(cal_high_voltage - cal_low_voltage)/(cal_high_ticks - cal_low_ticks) + \
+        cal_low_voltage
 
     return voltage
 

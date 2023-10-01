@@ -67,9 +67,9 @@ def on_device_status(mqtt_client, userdata, msg):
 
         if devices_with_device_id:
             this_device: IOTDevice = devices_with_device_id[0]
-            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks, cal_low_ticks=this_device.cal_low_ticks,
+            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks, cal_low_ticks=this_device.cal_low_ticks_voltage,
                                                      cal_low_voltage=this_device.cal_low_voltage,
-                                                     cal_high_ticks=this_device.cal_high_ticks,
+                                                     cal_high_ticks=this_device.cal_high_ticks_voltage,
                                                      cal_high_voltage=this_device.cal_high_voltage)
 
     if 'pressure' in status:
