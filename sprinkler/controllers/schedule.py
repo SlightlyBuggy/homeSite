@@ -30,11 +30,11 @@ def ping_devices_for_status_and_update_schedules(request):
             # handle each schedule type
             match active_schedule.schedule_type:
 
-                # ping the device for status if it is supposed to be awake
+                # ping the device for status.  if its supposed to be asleep, it will be put to sleep if needed by
+                # mqtt.on_device_status()
                 case ScheduleTypes.GET_DEVICE_STATUS:
-                    if device.should_be_awake():
-                        command_service.handle_status_command(schedule=active_schedule, device=device)
-                        scheduled_tasks_executed += 1
+                    command_service.handle_status_command(schedule=active_schedule, device=device)
+                    scheduled_tasks_executed += 1
 
                 # for the sprinkle command, we just want to ensure next_exection is appropriate based on
                 # past water events and rain events
