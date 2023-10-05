@@ -62,7 +62,7 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
     # set the interval from the schedule or the override property
     minutes_till_next_scheduled_event = interval_minutes if interval_minutes else schedule.interval_minutes
 
-    scheduled_dt = starting_at + timedelta(0, 0, 0, 0, minutes_till_next_scheduled_event)
+    scheduled_dt = starting_at + timedelta(minutes=minutes_till_next_scheduled_event)
 
     # make sure the schedule's hour/minute are respected
     if schedule.hour:
@@ -78,15 +78,15 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
     scheduled_dt = scheduled_dt.replace(microsecond=0)
 
     # if the new time is before the interval has elapsed, push forward 1 day
-    if scheduled_dt < starting_at + timedelta(0, 0, 0, 0, minutes_till_next_scheduled_event):
-        scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
+    if scheduled_dt < starting_at + timedelta(minutes=minutes_till_next_scheduled_event):
+        scheduled_dt = scheduled_dt + timedelta(days=1)
 
     current_dt = datetime.now(timezone.utc)
 
     # ensure the scheduled time is in the future.  this will heal cases where the server has been offline
     # for awhile or whatever
     while scheduled_dt < current_dt:
-        scheduled_dt = scheduled_dt + timedelta(0, 0, 1)
+        scheduled_dt = scheduled_dt + timedelta(days=1)
 
     return scheduled_dt
 
@@ -114,7 +114,7 @@ def add_minutes_to_dt(dt: datetime, minutes: int) -> datetime:
     :return: new datetime.datetime object with minutes added
     """
 
-    return dt + timedelta(0, 0, 0, 0, minutes)
+    return dt + timedelta(minutes=minutes)
 
 
 def build_schedule_execution(schedule: IOTDeviceSchedule, t: datetime, mqtt_response: JsonResponse) -> \
