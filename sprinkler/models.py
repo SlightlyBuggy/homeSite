@@ -81,8 +81,29 @@ class IOTDevice(Device):
         except IndexError:
             pass
 
+    def today_active_schedules(self):
+
+        current_dt = datetime.now(timezone.utc)
+        current_date = current_dt.date()
+
+        this_device_schedules = self.iotdeviceschedule_set.objects.filter(active=True)
+
+        today_schedules = [sched for sched in this_device_schedules if sched.next_execution.date() == current_date]
+        pending_schedules = [sched for sched in today_schedules if sched.next_execution <= current_dt]
+        future_schedules_today = [sched for sched in today_schedules if sched.next_execution > current_dt]
+
+        return pending_schedules, future_schedules_today
+
     # TODO: need to do a more robust check for offline/offline
-    def should_be_awake(self):
+    def should_be_awake_now(self):
+        """
+        Returns True if device should be awake now based on wake window
+        :return: Boolean
+        """
+
+        if not self.time_awake_start_hour_utc or not self.time_awake_stop_hour_utc:
+            return False
+
         if self.time_awake_start_hour_utc == self.time_awake_stop_hour_utc:
             return True
 
@@ -98,6 +119,24 @@ class IOTDevice(Device):
 
         return False
 
+    def should_be_awake_later_today(self):
+        """
+        Returns True if device should be awake later today based on wake window
+        :return: Boolean
+        """
+
+        if not self.time_awake_start_hour_utc or not self.time_awake_stop_hour_utc:
+            return False
+
+        current_dt = datetime.now(timezone.utc)
+
+        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_start_hour_utc, minute=0, second=0,
+                                                            microsecond=0)
+
+        if current_dt < dt_awake_start:
+            return True
+
+        return False
 
 # types of schedules
 class ScheduleTypes(models.TextChoices):
