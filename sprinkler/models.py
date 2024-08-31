@@ -86,9 +86,9 @@ class IOTDevice(Device):
         current_dt = datetime.now(timezone.utc)
         current_date = current_dt.date()
 
-        this_device_schedules = self.iotdeviceschedule_set.objects.filter(active=True)
+        these_active_device_schedules = self.iotdeviceschedule_set.all().filter(active=True)
 
-        today_schedules = [sched for sched in this_device_schedules if sched.next_execution.date() == current_date]
+        today_schedules = [sched for sched in these_active_device_schedules if sched.next_execution.date() == current_date]
         pending_schedules = [sched for sched in today_schedules if sched.next_execution <= current_dt]
         future_schedules_today = [sched for sched in today_schedules if sched.next_execution > current_dt]
 
@@ -138,6 +138,7 @@ class IOTDevice(Device):
 
         return False
 
+
 # types of schedules
 class ScheduleTypes(models.TextChoices):
     SPRINKLE = 'sprinkle'
@@ -147,7 +148,7 @@ class ScheduleTypes(models.TextChoices):
 # Device-specific schedule configuration
 class IOTDeviceSchedule(BaseModel):
 
-    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE, related_name='schedules')
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
     schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
                                      default=ScheduleTypes.GET_DEVICE_STATUS)

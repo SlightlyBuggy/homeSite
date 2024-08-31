@@ -9,6 +9,7 @@ urlpatterns = [
     path('sleep_now', device_command.sleep_now, name='sleep_now'),
     path('switch_broker_debug', device_command.switch_broker_debug, name='switch_broker_debug'),
     path('switch_broker_prod', device_command.switch_broker_prod, name='switch_broker_prod'),
+    path('power_off', device_command.power_off, name='power_off'),
     path('ping_devices_for_status_and_update_schedules', schedule.ping_devices_for_status_and_update_schedules,
          name='ping_devices_for_status_and_update_schedules'),
     path('get_precip_observations', precipitation.get_precip_observations, name='get_precip_observations'),

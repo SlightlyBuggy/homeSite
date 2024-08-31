@@ -51,6 +51,10 @@ $(document).on('click', 'button', function() {
             console.log("Switch to prod broker")
             request_url = "api/switch_broker_prod"
             break;
+        case 'power-off':
+            console.log("Power off")
+            request_url = "api/power_off"
+            break;
         default:
             console.log(`Unknown request type ${request_type}`)
             return;

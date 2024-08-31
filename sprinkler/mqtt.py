@@ -116,13 +116,12 @@ def on_device_status(mqtt_client, userdata, msg):
 
     # if we've made it here, the device doesn't have any tasks to accomplish now, doesn't need to be awake now,
     # doesn't need to be awake later, and has no tasks later.  It should be shut off for the day
-    print(f"Telling device {device_id} to turn off")
-    payload = {
-        'device_id': device_id,
-        'command': COMMAND_POWER_OFF,
-    }
-    print("Commanding device to turn off")
-    send_mqtt_message(COMMAND_TOPIC, str(payload))
+    # print(f"Telling device {device_id} to turn off")
+    # payload = {
+    #     'device_id': device_id,
+    #     'command': COMMAND_POWER_OFF,
+    # }
+    # send_mqtt_message(COMMAND_TOPIC, str(payload))
 
     return
 

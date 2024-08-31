@@ -128,3 +128,17 @@ def switch_broker_prod(request):
     mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
+@csrf_exempt
+def power_off(request):
+    request_data = json.loads(request.body)
+    device_id = request_data['device_id']
+
+    payload = {
+        'device_id': device_id,
+        'command': mqtt.COMMAND_POWER_OFF
+    }
+
+    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    return mqtt_response
+
+
