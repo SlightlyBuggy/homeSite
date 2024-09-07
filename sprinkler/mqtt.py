@@ -63,7 +63,8 @@ def on_device_status(mqtt_client, userdata, msg):
 
         if devices_with_device_id:
             this_device: IOTDevice = devices_with_device_id[0]
-            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks, cal_low_ticks=this_device.cal_low_ticks_voltage,
+            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks,
+                                                     cal_low_ticks=this_device.cal_low_ticks_voltage,
                                                      cal_low_voltage=this_device.cal_low_voltage,
                                                      cal_high_ticks=this_device.cal_high_ticks_voltage,
                                                      cal_high_voltage=this_device.cal_high_voltage)
@@ -116,12 +117,12 @@ def on_device_status(mqtt_client, userdata, msg):
 
     # if we've made it here, the device doesn't have any tasks to accomplish now, doesn't need to be awake now,
     # doesn't need to be awake later, and has no tasks later.  It should be shut off for the day
-    # print(f"Telling device {device_id} to turn off")
-    # payload = {
-    #     'device_id': device_id,
-    #     'command': COMMAND_POWER_OFF,
-    # }
-    # send_mqtt_message(COMMAND_TOPIC, str(payload))
+    print(f"Telling device {device_id} to turn off")
+    payload = {
+        'device_id': device_id,
+        'command': COMMAND_POWER_OFF,
+    }
+    send_mqtt_message(COMMAND_TOPIC, str(payload))
 
     return
 

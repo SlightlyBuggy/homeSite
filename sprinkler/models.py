@@ -62,6 +62,9 @@ class Device(BaseModel):
     time_awake_start_hour_utc = models.IntegerField(null=True)
     time_awake_stop_hour_utc = models.IntegerField(null=True)
 
+    # override to allow manual control
+    stay_awake = models.BooleanField(default=False)
+
     class Meta:
         abstract = True
 
@@ -94,19 +97,22 @@ class IOTDevice(Device):
 
         return pending_schedules, future_schedules_today
 
-    # TODO: need to do a more robust check for offline/offline
     def should_be_awake_now(self):
         """
-        Returns True if device should be awake now based on wake window
+        Returns True if device should be awake now based on wake window.  During this period,
+        the device should be listening for commands.  This allows manual control.
         :return: Boolean
         """
 
+        # always stay online if that is configured
+        if self.stay_awake:
+            return True
+
+        # if a wake window is not defined, return false
         if not self.time_awake_start_hour_utc or not self.time_awake_stop_hour_utc:
             return False
 
-        if self.time_awake_start_hour_utc == self.time_awake_stop_hour_utc:
-            return True
-
+        # if the wake window is defined, evaluate if we are in the wake window
         dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_start_hour_utc, minute=0, second=0,
                                                             microsecond=0)
         dt_awake_end = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
