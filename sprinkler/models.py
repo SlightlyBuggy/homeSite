@@ -235,11 +235,11 @@ class DeviceStatusLog(BaseModel):
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
     supply_voltage_ticks = models.IntegerField(null=True)
     supply_voltage = models.FloatField(null=True)
-    water_pressure_psi = models.FloatField(null=True)
+    water_pressure_ticks = models.IntegerField(null=True)
 
     def __str__(self):
         return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')} | {self.supply_voltage} V | " \
-               f"{self.water_pressure_psi} PSI"
+               f"{self.water_pressure_ticks} water pressure ticks"
 
 
 # store global settings - not sure what exactly, but it might be useful

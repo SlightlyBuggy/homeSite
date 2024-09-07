@@ -23,6 +23,7 @@
                 <th>Status</th>
                 <th>Status time</th>
                 <th>Voltage</th>
+                <th>Pressure ticks</th>
                 <th>Commands</th>
                 {% for device in all_devices %}
                     <tr>
@@ -37,6 +38,7 @@
                         </td>
                         <td>{{device.get_latest_status.created|localtime }}</td>
                         <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
+                        <td>{{device.get_latest_status.water_pressure_ticks|floatformat:2}}</td>
                         <td>
                             <button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button>
                             <button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button>

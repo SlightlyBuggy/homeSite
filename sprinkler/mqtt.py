@@ -69,9 +69,10 @@ def on_device_status(mqtt_client, userdata, msg):
                                                      cal_high_ticks=this_device.cal_high_ticks_voltage,
                                                      cal_high_voltage=this_device.cal_high_voltage)
 
-    if 'pressure' in status:
-        water_pressure_pascals = status['pressure']
-        water_pressure_psi = water_pressure_pascals*PSI_PER_PASCAL
+    # handle water pressure
+    water_pressure_ticks = None
+    if 'pressure_ticks' in status:
+        water_pressure_ticks = status['pressure_ticks']
 
     transmitting_device = IOTDevice.objects.get(device_id=device_id)
 
@@ -81,11 +82,10 @@ def on_device_status(mqtt_client, userdata, msg):
 
     new_device_status = DeviceStatusLog(device=transmitting_device, supply_voltage=voltage,
                                         supply_voltage_ticks=voltage_ticks,
-                                        water_pressure_psi=water_pressure_psi)
+                                        water_pressure_ticks=water_pressure_ticks)
     new_device_status.save()
 
     # TODO: have process that ensures devices with a wake window eventually go to sleep, i.e. pings them for status
-
     pending_schedules, future_schedules_today = transmitting_device.today_active_schedules()
 
     # if we've got pending things to do, do them
@@ -97,6 +97,7 @@ def on_device_status(mqtt_client, userdata, msg):
 
     # if the device should be awake now, don't tell it to do anything
     if device_should_be_awake:
+        print(f"Telling device {device_id} to stay awake")
         return
 
     device_should_be_awake_later_today = transmitting_device.should_be_awake_later_today()
