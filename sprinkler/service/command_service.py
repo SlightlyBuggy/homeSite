@@ -2,9 +2,11 @@ import util.automation_utils as util
 import sprinkler.mqtt as mqtt
 from sprinkler.models import IOTDeviceSchedule, IOTDevice
 from datetime import datetime, timezone
+from django.views.decorators.csrf import csrf_exempt
 
 
-def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
+@csrf_exempt
+def handle_status_command(device: IOTDevice):
     """
     Handle a device status command.  Update the schedule's next_execution property and create a
     IOTDeviceScheduleExecution object
@@ -14,28 +16,16 @@ def handle_status_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     :return:
     """
 
-    current_dt = datetime.now(timezone.utc)
-    if not schedule.interval_minutes:
-        print("Unable to process schedule.  Missing interval_minutes")
-        return
-
     status_body = {
         'device_id': device.device_id,
         'command': mqtt.COMMAND_STATUS
     }
 
     mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, status_body)
-
-    # set the next scheduled time
-    schedule.next_execution = util.get_next_schd_using_interval(schedule)
-    schedule.save()
-
-    # create and save the schedule_execution object
-    schedule_execution = util.build_schedule_execution(schedule, current_dt, mqtt_response)
-    schedule_execution.save()
     return
 
 
+@csrf_exempt
 def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
     """
     Handle a spinkle lawn command.  Update the schedule's next_execution property.

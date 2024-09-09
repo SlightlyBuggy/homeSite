@@ -36,7 +36,6 @@ def on_device_message(mqtt_client, userdata, msg):
     print(f'Received device message on topic: {msg.topic} with payload: {msg.payload}')
 
 
-# TODO: the "execute scheduled tasks" may need to be pared down to checking the precip report
 # TODO: also consider device status body, like 'just woke up' and 'just finished sprinkling' and 'pump commanded on', etc
 def on_device_status(mqtt_client, userdata, msg):
     # TODO: this function is too long, and business logic shouldn't be in the mqtt module
@@ -52,10 +51,8 @@ def on_device_status(mqtt_client, userdata, msg):
     device_id = message_contents['device_id']
     status = message_contents['status']
 
-    # TODO: include pressure ticks and conversion to pressure
     voltage_ticks = None
     voltage = None
-    water_pressure_psi = None
 
     if 'voltage_ticks' in status:
         voltage_ticks = status['voltage_ticks']
@@ -100,10 +97,8 @@ def on_device_status(mqtt_client, userdata, msg):
         print(f"Telling device {device_id} to stay awake")
         return
 
-    device_should_be_awake_later_today = transmitting_device.should_be_awake_later_today()
-
     # if the device needs to be awake later today, or has things to do later today, put it to sleep
-    if device_should_be_awake_later_today or future_schedules_today:
+    if future_schedules_today:
         payload = {
             'device_id': device_id,
             'command': COMMAND_SLEEP,

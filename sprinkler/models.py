@@ -55,12 +55,8 @@ class Device(BaseModel):
     cal_high_voltage = models.FloatField(null=True)
 
     # calibration for water pressure
-    cal_low_pressure_psi = models.FloatField(null=True)
-    cal_high_pressure_psi = models.FloatField(null=True)
-
-    # sleep/awake time
-    time_awake_start_hour_utc = models.IntegerField(null=True)
-    time_awake_stop_hour_utc = models.IntegerField(null=True)
+    cal_low_pressure_ticks = models.IntegerField(null=True)
+    cal_high_pressure_ticks = models.IntegerField(null=True)
 
     # override to allow manual control
     stay_awake = models.BooleanField(default=False)
@@ -91,7 +87,8 @@ class IOTDevice(Device):
 
         these_active_device_schedules = self.iotdeviceschedule_set.all().filter(active=True)
 
-        today_schedules = [sched for sched in these_active_device_schedules if sched.next_execution.date() == current_date]
+        today_schedules = [sched for sched in these_active_device_schedules if
+                           sched.next_execution.date() == current_date]
         pending_schedules = [sched for sched in today_schedules if sched.next_execution <= current_dt]
         future_schedules_today = [sched for sched in today_schedules if sched.next_execution > current_dt]
 
@@ -99,7 +96,7 @@ class IOTDevice(Device):
 
     def should_be_awake_now(self):
         """
-        Returns True if device should be awake now based on wake window.  During this period,
+        Returns True if device should be awake now.  During this period,
         the device should be listening for commands.  This allows manual control.
         :return: Boolean
         """
@@ -108,47 +105,12 @@ class IOTDevice(Device):
         if self.stay_awake:
             return True
 
-        # if a wake window is not defined, return false
-        if not self.time_awake_start_hour_utc or not self.time_awake_stop_hour_utc:
-            return False
-
-        # if the wake window is defined, evaluate if we are in the wake window
-        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_start_hour_utc, minute=0, second=0,
-                                                            microsecond=0)
-        dt_awake_end = datetime.now(timezone.utc).replace(hour=self.time_awake_stop_hour_utc, minute=0, second=0,
-                                                          microsecond=0)
-
-        current_dt = datetime.now(timezone.utc)
-
-        if dt_awake_start < current_dt < dt_awake_end:
-            return True
-
-        return False
-
-    def should_be_awake_later_today(self):
-        """
-        Returns True if device should be awake later today based on wake window
-        :return: Boolean
-        """
-
-        if not self.time_awake_start_hour_utc or not self.time_awake_stop_hour_utc:
-            return False
-
-        current_dt = datetime.now(timezone.utc)
-
-        dt_awake_start = datetime.now(timezone.utc).replace(hour=self.time_awake_start_hour_utc, minute=0, second=0,
-                                                            microsecond=0)
-
-        if current_dt < dt_awake_start:
-            return True
-
         return False
 
 
 # types of schedules
 class ScheduleTypes(models.TextChoices):
     SPRINKLE = 'sprinkle'
-    GET_DEVICE_STATUS = 'get_status'
 
 
 # Device-specific schedule configuration
@@ -157,7 +119,7 @@ class IOTDeviceSchedule(BaseModel):
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
 
     schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
-                                     default=ScheduleTypes.GET_DEVICE_STATUS)
+                                     default=ScheduleTypes.SPRINKLE)
     # If only hour is populated, this means every day on that hour.  if only minute, every hour on that
     # minute.  Only one of the two should be populated
     hour = models.IntegerField()
@@ -182,7 +144,7 @@ class IOTDeviceScheduleExecution(BaseModel):
     iot_device_schedule = models.ForeignKey(IOTDeviceSchedule, on_delete=models.CASCADE)
 
     schedule_type = models.CharField(max_length=100, choices=ScheduleTypes.choices,
-                                     default=ScheduleTypes.GET_DEVICE_STATUS)
+                                     default=ScheduleTypes.SPRINKLE)
 
     start_time = models.DateTimeField(auto_now=False)
     exit_code = models.IntegerField()

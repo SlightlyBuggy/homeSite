@@ -74,7 +74,7 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
         schedule.save()
         return
 
-    # we should ensure the next execuction is after the last water event + scheudle interval
+    # we should ensure the next execuction is after the last water event + schedule interval
     if last_water_end:
         tentative_next_exeuction = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
                                                                        interval_minutes=
