@@ -12,8 +12,6 @@ urlpatterns = [
     path('power_off', device_command.power_off, name='power_off'),
     path('ping_devices_for_status', schedule.ping_devices_for_status,
          name='ping_devices_for_status'),
-    path('update_schedules', schedule.update_schedules,
-         name='update_schedules'),
     path('get_precip_observations', precipitation.get_precip_observations, name='get_precip_observations'),
     path('publish', mqtt.publish_message, name='publish'),
 ]
