@@ -97,7 +97,7 @@ class IOTDevice(Device):
     def should_be_awake_later_today(self):
         pending_schedules, future_schedules = self.today_active_schedules()
 
-        if pending_schedules:
+        if future_schedules:
             return True
 
         return False

@@ -81,7 +81,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
         return
 
     # if the device needs to be awake later today, put it to sleep for now
-    if transmitting_device.should_be_awake_later_today:
+    if transmitting_device.should_be_awake_later_today():
         payload = {
             'device_id': device_id,
             'command': sprinkler_constants.COMMAND_SLEEP,
