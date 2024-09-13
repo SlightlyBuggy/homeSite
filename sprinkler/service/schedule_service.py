@@ -6,13 +6,13 @@ import util.automation_utils as util
 from typing import List
 
 
-def execute_scheduled_tasks(device: IOTDevice):
+def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
     """
     Execute scheduled tasks for a particular device
     :param device:
-    :return:
+    :return: int: num of tasks executed
     """
-# grab active schedules
+    # grab active schedules
     active_schedules: list[IOTDeviceSchedule] = IOTDeviceSchedule.objects.filter(active=True, device=device)
     current_dt = datetime.now(timezone.utc)
 
@@ -28,13 +28,13 @@ def execute_scheduled_tasks(device: IOTDevice):
             # handle each schedule type
             match active_schedule.schedule_type:
                 case ScheduleTypes.SPRINKLE:
-                    command_service.handle_sprinkle_command(schedule=active_schedule, device=device)
+                    command_service.handle_sprinkle_command(schedule=active_schedule, device=device,
+                                                            can_sprinkle=can_sprinkle)
                     scheduled_tasks_executed += 1
 
                 case _:
                     pass
-    print(f"{current_dt}: Executed {scheduled_tasks_executed} tasks")
-    return JsonResponse({'tasks executed': scheduled_tasks_executed})
+    return scheduled_tasks_executed
 
 
 def get_today_scheduled_tasks(device: IOTDevice) -> List[IOTDeviceSchedule]:

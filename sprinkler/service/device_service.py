@@ -27,6 +27,14 @@ def should_device_be_awake(device: IOTDevice):
 
 
 def handle_device_status(device_id, status, message_sender) -> None:
+    """
+    Take appropriate action when a device reports its status
+
+    :param device_id: IOTDevice
+    :param status: status object from device
+    :param message_sender:
+    :return:
+    """
     voltage_ticks = None
     voltage = None
 
@@ -58,11 +66,12 @@ def handle_device_status(device_id, status, message_sender) -> None:
                                         water_pressure_ticks=water_pressure_ticks)
     new_device_status.save()
 
-    pending_schedules, future_schedules_today = transmitting_device.today_active_schedules()
+    # TODO: this is a hack until the device can tell us whether it can sprinkle
+    can_sprinkle = device_measured_enough_water_to_sprinkle_from_last_status(transmitting_device)
 
-    # if we've got pending things to do, do them
-    if pending_schedules:
-        execute_scheduled_tasks(device=transmitting_device)
+    # attempt to execute any tasks we need to.  if we did, we're done.
+    tasks_executed = execute_scheduled_tasks(device=transmitting_device, can_sprinkle=can_sprinkle)
+    if tasks_executed:
         return
 
     # if the device should be awake now, don't tell it to do anything
@@ -71,8 +80,8 @@ def handle_device_status(device_id, status, message_sender) -> None:
         print(f"Telling device {device_id} to stay awake")
         return
 
-    # if the device needs to be awake later today, or has things to do later today, put it to sleep
-    if future_schedules_today:
+    # if the device needs to be awake later today, put it to sleep for now
+    if transmitting_device.should_be_awake_later_today:
         payload = {
             'device_id': device_id,
             'command': sprinkler_constants.COMMAND_SLEEP,
@@ -94,3 +103,34 @@ def handle_device_status(device_id, status, message_sender) -> None:
     message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))
 
     return
+
+
+def device_measured_enough_water_to_sprinkle_from_last_status(device: IOTDevice) -> bool:
+    """
+    Based on last status, does the device have enough water to sprinkle?
+    :param device: IOTDevice
+    :return: bool - whether the device reported enough water to sprinkle or not
+    """
+
+    if not device.cal_low_pressure_ticks or not device.cal_high_pressure_ticks:
+        return False
+
+    last_status_qs = DeviceStatusLog.objects.filter(device=device).order_by('-created')[:1]
+    if not last_status_qs:
+        return False
+
+    last_status: DeviceStatusLog = last_status_qs[0]
+
+    last_measured_ticks = last_status.water_pressure_ticks
+    if not last_measured_ticks:
+        return False
+
+    min_percent = sprinkler_constants.MIN_PERCENT_TO_WATER
+
+    # interpolate to determine min ticks based on min percent
+    min_ticks = (device.cal_high_pressure_ticks -
+                 device.cal_low_pressure_ticks)*min_percent/100 + device.cal_low_pressure_ticks
+
+    return last_measured_ticks >= min_ticks
+
+

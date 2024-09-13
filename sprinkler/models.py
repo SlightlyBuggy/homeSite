@@ -94,6 +94,14 @@ class IOTDevice(Device):
 
         return pending_schedules, future_schedules_today
 
+    def should_be_awake_later_today(self):
+        pending_schedules, future_schedules = self.today_active_schedules()
+
+        if pending_schedules:
+            return True
+
+        return False
+
     def should_be_awake_now(self):
         """
         Returns True if device should be awake now.  During this period,
@@ -126,7 +134,7 @@ class IOTDeviceSchedule(BaseModel):
     minute = models.IntegerField()
 
     # if this is populated, schedule initially starts at above value then repeats every interval_minutes
-    interval_minutes = models.IntegerField()
+    interval_minutes = models.IntegerField() # TODO: get rid of this nonsense
 
     # this will be managed by the automation
     next_execution = models.DateTimeField(auto_now=False)

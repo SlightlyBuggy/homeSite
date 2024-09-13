@@ -25,16 +25,22 @@ def handle_status_command(device: IOTDevice):
     return
 
 
+# TODO: get rid of can_sprinkle from this and other functions once the device can tell us whether it can sprinkle
 @csrf_exempt
-def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice):
+def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_sprinkle):
     """
     Handle a spinkle lawn command.  Update the schedule's next_execution property.
     Create a IOTDeviceScheduleExecution object.
 
     :param schedule: IOTDeviceSchedule
     :param device: IOTDevice
+    :param can_sprinkle: boolean - indicates whether device has enough water to sprinkle
     :return:
     """
+
+    # TODO: this is a hack until the device can tell us whether it can sprinkle or not
+    if not can_sprinkle:
+        return
 
     current_dt = datetime.now(timezone.utc)
 
