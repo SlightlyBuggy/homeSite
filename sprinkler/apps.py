@@ -6,6 +6,5 @@ class SprinklerConfig(AppConfig):
     name = 'sprinkler'
 
     def ready(self):
-        from sprinkler import mqtt
-
-        mqtt.client.loop_start()
+        from sprinkler.classes.iot_messenger import IotMessenger
+        messenger = IotMessenger()
