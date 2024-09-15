@@ -26,7 +26,7 @@ def should_device_be_awake(device: IOTDevice):
     return dt_awake_start < current_dt < dt_awake_end
 
 
-def handle_device_status(device_id, status, message_sender) -> None | dict:
+def handle_device_status(device_id, status, message_sender) -> None:
     """
     Take appropriate action when a device reports its status
 
@@ -77,7 +77,7 @@ def handle_device_status(device_id, status, message_sender) -> None | dict:
     # if the device should be awake now, don't tell it to do anything
     device_should_be_awake = transmitting_device.should_be_awake_now()
     if device_should_be_awake:
-        print(f"Not responding to {device_id} so it will stay awake")
+        print(f"Telling device {device_id} to stay awake")
         return
 
     # if the device needs to be awake later today, put it to sleep for now
@@ -86,11 +86,11 @@ def handle_device_status(device_id, status, message_sender) -> None | dict:
             'device_id': device_id,
             'command': sprinkler_constants.COMMAND_SLEEP,
             'body': {
-                'sleep_length_minutes': "60"  # TODO: scale this so it wakes up right after the scheduled task
+                'sleep_length_minutes': "60" # TODO: scale this so it wakes up right after the scheduled task
             }
         }
 
-        return payload
+        return message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))
 
     # if we've made it here, the device doesn't have any tasks to accomplish now, doesn't need to be awake now,
     # doesn't need to be awake later, and has no tasks later.  It should be shut off for the day
@@ -100,7 +100,9 @@ def handle_device_status(device_id, status, message_sender) -> None | dict:
         'command': sprinkler_constants.COMMAND_POWER_OFF,
     }
 
-    return payload
+    message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))
+
+    return
 
 
 def device_measured_enough_water_to_sprinkle_from_last_status(device: IOTDevice) -> bool:
