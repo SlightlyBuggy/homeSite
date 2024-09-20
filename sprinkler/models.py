@@ -204,7 +204,7 @@ class SprinklerLog(BaseModel):
 class DeviceStatusLog(BaseModel):
     device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
     supply_voltage_ticks = models.IntegerField(null=True)
-    supply_voltage = models.FloatField(null=True)
+    supply_voltage = models.FloatField(null=True)  # TODO: do we need this?
     water_pressure_ticks = models.IntegerField(null=True)
 
     def __str__(self):

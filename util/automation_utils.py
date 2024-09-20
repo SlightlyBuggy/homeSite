@@ -9,7 +9,7 @@ MINUTES_IN_DAY = 1440
 PSI_PER_PASCAL = 0.000145038
 
 
-def get_last_watering_and_status(device_id) -> tuple[any, bool]:
+def get_last_watering_end_time_and_watering_status(device_id) -> tuple[any, bool]:
     """
     Determine what the end of the most recent rain or watering event is, and whether a watering event is in
     progress

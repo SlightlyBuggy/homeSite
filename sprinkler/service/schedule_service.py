@@ -9,7 +9,8 @@ from typing import List
 def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
     """
     Execute scheduled tasks for a particular device
-    :param device:
+    :param device: IOTDevice
+    :param can_sprinkle: boolean, determines whether device can execute a sprinkling task
     :return: int: num of tasks executed
     """
     # grab active schedules
@@ -63,8 +64,8 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
     """
 
     current_dt = datetime.now(timezone.utc)
-    # get the end time and status of watering event (rain, sprinkler, etc
-    last_water_end, watering_in_progress = util.get_last_watering_and_status(device_id=device.device_id)
+    # get the end time and status of watering event (rain, sprinkler, etc)
+    last_water_end, watering_in_progress = util.get_last_watering_end_time_and_watering_status(device_id=device.device_id)
 
     # if a watering event is in progress, recalculate the next_execution starting now
     if watering_in_progress:
@@ -74,7 +75,7 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
         schedule.save()
         return
 
-    # we should ensure the next execuction is after the last water event + schedule interval
+    # we should ensure the next execution is after the last water event + schedule interval
     if last_water_end:
         tentative_next_exeuction = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
                                                                        interval_minutes=
@@ -84,3 +85,10 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
             schedule.save()
 
         return
+
+
+def update_sprinkle_schedules():
+    all_sprinkle_schedules: list[IOTDeviceSchedule] = IOTDeviceSchedule.objects.filter(schedule_type=ScheduleTypes.SPRINKLE)
+
+    for sprinkle_schedule in all_sprinkle_schedules:
+        update_next_sprinkle_execution(sprinkle_schedule, sprinkle_schedule.device)
