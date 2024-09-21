@@ -37,10 +37,3 @@ class WeatherServiceTest(TestCase):
         self.assertNotEqual(earlier_log.start_time, None)
         self.assertNotEqual(most_recent_log.total_amount_inches, None)
         self.assertTrue(earlier_log.end_time > earlier_log.start_time)
-
-    def test_get_and_record_precip_observations_with_schedules(self):
-        """
-        Verify that schedules are updated appropriately given a rain event
-        """
-        #TODO: set up a test device and schedule.  verify a rain event appropriately bumps out the next exeuction
-

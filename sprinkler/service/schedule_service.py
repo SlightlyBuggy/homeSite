@@ -1,7 +1,6 @@
 from sprinkler.models import IOTDeviceSchedule, ScheduleTypes, IOTDevice
 from datetime import datetime, timezone
 from sprinkler.service import command_service
-from django.http import JsonResponse
 import util.automation_utils as util
 from typing import List
 
@@ -65,7 +64,8 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
 
     current_dt = datetime.now(timezone.utc)
     # get the end time and status of watering event (rain, sprinkler, etc)
-    last_water_end, watering_in_progress = util.get_last_watering_end_time_and_watering_status(device_id=device.device_id)
+    last_water_end, watering_in_progress = util.get_last_watering_end_time_and_watering_status(
+        device_id=device.device_id)
 
     # if a watering event is in progress, recalculate the next_execution starting now
     if watering_in_progress:
@@ -77,18 +77,19 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
 
     # we should ensure the next execution is after the last water event + schedule interval
     if last_water_end:
-        tentative_next_exeuction = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
+        tentative_next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
                                                                        interval_minutes=
                                                                        device.minimum_water_interval_hours*60)
-        if tentative_next_exeuction > schedule.next_execution:
-            schedule.next_execution = tentative_next_exeuction
+        if tentative_next_execution > schedule.next_execution:
+            schedule.next_execution = tentative_next_execution
             schedule.save()
 
         return
 
 
 def update_sprinkle_schedules():
-    all_sprinkle_schedules: list[IOTDeviceSchedule] = IOTDeviceSchedule.objects.filter(schedule_type=ScheduleTypes.SPRINKLE)
+    all_sprinkle_schedules: list[IOTDeviceSchedule] = IOTDeviceSchedule.objects.filter(schedule_type=
+                                                                                       ScheduleTypes.SPRINKLE)
 
     for sprinkle_schedule in all_sprinkle_schedules:
         update_next_sprinkle_execution(sprinkle_schedule, sprinkle_schedule.device)

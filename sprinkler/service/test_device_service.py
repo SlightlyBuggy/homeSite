@@ -1,9 +1,10 @@
 from django.test import TestCase
 from sprinkler.service import device_service
-from sprinkler.models import IOTDevice, IOTDeviceSchedule, SprinklerLog, ScheduleTypes, DeviceStatusLog
+from sprinkler.models import IOTDevice, SprinklerLog, ScheduleTypes, DeviceStatusLog
 from datetime import datetime, timezone, timedelta
 import ast
 from sprinkler import constants
+from sprinkler.factories import iotdevice_factory, iotdeviceschedule_factory
 
 
 class DeviceServiceTest(TestCase):
@@ -28,20 +29,9 @@ class DeviceServiceTest(TestCase):
     def setUp(self):
 
         # create a device
-        self.test_device = IOTDevice.objects.create(name="test1",
-                                                    minimum_water_interval_hours=168,
-                                                    watering_length_minutes=10,
-                                                    watering_wait_minutes=5,
-                                                    watering_repetitions=2,
-                                                    device_id=self.test_device_id,
-                                                    cal_low_ticks_voltage=100,
-                                                    cal_high_ticks_voltage=700,
-                                                    cal_low_voltage=10,
-                                                    cal_high_voltage=13,
-                                                    cal_low_pressure_ticks=self.fake_device_low_pressure_ticks,
-                                                    cal_high_pressure_ticks=self.fake_device_high_pressure_ticks,
-                                                    ipv4_address=1,
-                                                    port=1)
+        self.test_device = iotdevice_factory.create_device(device_id=self.test_device_id, device_name="test1",
+                                                           cal_low_pressure_ticks=self.fake_device_low_pressure_ticks,
+                                                           cal_high_pressure_ticks=self.fake_device_high_pressure_ticks)
 
     def test_handle_device_status_executes_scheduled_event_in_past(self):
         test_status = {
@@ -52,13 +42,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the past
         one_hour_ago = datetime.now(timezone.utc) + timedelta(hours=-1)
 
-        IOTDeviceSchedule.objects.create(device=self.test_device,
-                                         hour=0,
-                                         minute=0,
-                                         next_execution=one_hour_ago,
-                                         active=True,
-                                         interval_minutes=0,
-                                         schedule_type=ScheduleTypes.SPRINKLE)
+        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
+                                                           next_execution=one_hour_ago)
 
         device_service.handle_device_status(0, test_status, self.fake_mqtt_message_sender)
 
@@ -74,13 +59,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the future
         one_hour_ago = datetime.now(timezone.utc) + timedelta(hours=1)
 
-        IOTDeviceSchedule.objects.create(device=self.test_device,
-                                         hour=0,
-                                         minute=0,
-                                         next_execution=one_hour_ago,
-                                         active=True,
-                                         interval_minutes=0,
-                                         schedule_type=ScheduleTypes.SPRINKLE)
+        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
+                                                           next_execution=one_hour_ago)
 
         device_service.handle_device_status(0, test_status, self.fake_mqtt_message_sender)
 
@@ -96,13 +76,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the future
         one_hour_ago = datetime.now(timezone.utc) + timedelta(days=2)
 
-        IOTDeviceSchedule.objects.create(device=self.test_device,
-                                         hour=0,
-                                         minute=0,
-                                         next_execution=one_hour_ago,
-                                         active=True,
-                                         interval_minutes=0,
-                                         schedule_type=ScheduleTypes.SPRINKLE)
+        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
+                                                           next_execution=one_hour_ago)
 
         device_service.handle_device_status(device_id=0, status=test_status,
                                             message_sender=self.fake_mqtt_message_sender)

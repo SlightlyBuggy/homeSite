@@ -8,7 +8,7 @@ def get_precip_observations(request):
     :param request:
     :return: JsonResponse with precip events
     """
-    precip_observations = weather_service.get_and_record_precip_observations(test=False)
+    precip_observations = weather_service.get_and_record_precip_observations()
 
     precip_events = []
     if precip_observations:
