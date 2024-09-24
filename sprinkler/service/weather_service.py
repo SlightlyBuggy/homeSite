@@ -24,6 +24,8 @@ def get_and_record_precip_observations(test_file=None) -> PrecipObservations | N
     # ensure each observation is captured in the database
     if precip_observations:
         create_rain_logs_from_precip_observations(precip_observations=precip_observations)
+
+        #TODO: need way to manually override next schedule without automation fighting
         schedule_service.update_sprinkle_schedules()
 
     return precip_observations

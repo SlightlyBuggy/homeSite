@@ -9,8 +9,7 @@ from sprinkler import constants
 @csrf_exempt
 def handle_status_command(device: IOTDevice):
     """
-    Handle a device status command.  Update the schedule's next_execution property and create a
-    IOTDeviceScheduleExecution object
+    Handle a device status command.
 
     :param device: IOTDevice
     :return:
