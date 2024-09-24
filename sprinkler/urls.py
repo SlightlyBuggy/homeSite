@@ -19,6 +19,7 @@ import sprinkler.controllers.urls as api_urls
 
 app_name = 'sprinkler'
 urlpatterns = [
+    path('', views.device_status, name='device_status'),
     path('device_status', views.device_status, name='device_status'),
     path('api/', include(api_urls)),
 ]
