@@ -39,23 +39,6 @@ def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
     return scheduled_tasks_executed
 
 
-def get_today_scheduled_tasks(device: IOTDevice) -> List[IOTDeviceSchedule]:
-    """
-    Given an IOTDevice, fetch the scheduled tasks for today
-
-    :param device: IOTDevice
-    :return: List of scheduled tasks that need to be executed today
-    """
-    active_schedules: list[IOTDeviceSchedule] = IOTDeviceSchedule.objects.filter(active=True, device=device)
-
-    current_dt = datetime.now(timezone.utc)
-    current_date = current_dt.date()
-
-    today_schedules = [schedule for schedule in active_schedules if schedule.next_execution.date() == current_date]
-
-    return today_schedules
-
-
 def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevice):
     """
     Given a device and a schedule, update the next_execution property of the schedule
