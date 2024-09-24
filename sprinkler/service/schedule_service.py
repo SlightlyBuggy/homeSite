@@ -28,9 +28,11 @@ def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
             # handle each schedule type
             match active_schedule.schedule_type:
                 case ScheduleTypes.SPRINKLE:
-                    command_service.handle_sprinkle_command(schedule=active_schedule, device=device,
-                                                            can_sprinkle=can_sprinkle)
-                    scheduled_tasks_executed += 1
+                    sprinkle_command_executed = command_service.handle_sprinkle_command(schedule=active_schedule,
+                                                                                        device=device,
+                                                                                        can_sprinkle=can_sprinkle)
+                    if sprinkle_command_executed:
+                        scheduled_tasks_executed += 1
 
                 case _:
                     pass
