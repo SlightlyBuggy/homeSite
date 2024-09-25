@@ -2,8 +2,8 @@ from sprinkler.models import IOTDeviceSchedule, IOTDevice, ScheduleTypes
 from datetime import datetime
 
 
-def create_schedule(device: IOTDevice, next_execution: datetime,
-                    schedule_type) -> IOTDeviceSchedule:
+def create_schedule_zero_hour_minute(device: IOTDevice, next_execution: datetime,
+                                     schedule_type) -> IOTDeviceSchedule:
 
     schedule = IOTDeviceSchedule.objects.create(device=device,
                                                 hour=0,
@@ -16,7 +16,8 @@ def create_schedule(device: IOTDevice, next_execution: datetime,
     return schedule
 
 
-def create_sprinkle_schedule(device:IOTDevice, next_execution:datetime) -> IOTDeviceSchedule:
+def create_sprinkle_schedule(device: IOTDevice, next_execution: datetime) -> IOTDeviceSchedule:
 
-    return create_schedule(device=device, next_execution=next_execution, schedule_type=ScheduleTypes.SPRINKLE)
+    return create_schedule_zero_hour_minute(device=device, next_execution=next_execution,
+                                            schedule_type=ScheduleTypes.SPRINKLE)
 
