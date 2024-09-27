@@ -21,4 +21,3 @@ def create_weekly_sprinkle_schedule(device: IOTDevice, next_execution: datetime)
 
     return create_schedule_zero_hour_minute(device=device, next_execution=next_execution,
                                             schedule_type=ScheduleTypes.SPRINKLE, minimum_hours_between_executions=168)
-
