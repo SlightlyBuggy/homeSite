@@ -55,7 +55,7 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
     # if a watering event is in progress, recalculate the next_execution starting now
     if watering_in_progress:
         schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt,
-                                                                      interval_minutes=
+                                                                      minutes_between_executions=
                                                                       device.minimum_water_interval_hours*60)
         schedule.save()
         return
@@ -63,7 +63,7 @@ def update_next_sprinkle_execution(schedule: IOTDeviceSchedule, device: IOTDevic
     # we should ensure the next execution is after the last water event + schedule interval
     if last_water_end:
         tentative_next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=last_water_end,
-                                                                       interval_minutes=
+                                                                       minutes_between_executions=
                                                                        device.minimum_water_interval_hours*60)
         if tentative_next_execution > schedule.next_execution:
             schedule.next_execution = tentative_next_execution

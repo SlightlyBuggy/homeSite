@@ -51,18 +51,18 @@ def get_last_watering_end_time_and_watering_status(device_id) -> tuple[any, bool
     return last_sprinkler_or_rain_end, currently_raining or currently_sprinkling
 
 
-def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, interval_minutes=None):
+def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, minutes_between_executions=None):
     """
     Given a schedule, starting time, and optional interval, compute the next time the schedule should be
     evaluated, respecting the start hour and minute
     :param: schedule: IOTDeviceSchedule
     :param: starting_at: datetime.datetime from which next execution should be calculated
+    :param: minutes_between_executions: number of minutes between executions of this particular schedule
     :return: datetime.datetime of the next scheduled run
     """
-    # set the interval from the schedule or the override property
-    minutes_till_next_scheduled_event = interval_minutes if interval_minutes else schedule.interval_minutes
 
-    scheduled_dt = starting_at + timedelta(minutes=minutes_till_next_scheduled_event)
+    # TODO: move the minutes between executions to the DeviceSchedule object
+    scheduled_dt = starting_at + timedelta(minutes=minutes_between_executions)
 
     # make sure the schedule's hour/minute are respected
     if schedule.hour:
@@ -71,14 +71,14 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
         scheduled_dt = scheduled_dt.replace(minute=schedule.minute)
 
     # if there's no interval and no minute specified, set to x:00
-    if not schedule.minute and not schedule.interval_minutes:
+    if not schedule.minute:
         scheduled_dt = scheduled_dt.replace(minute=0)
 
     scheduled_dt = scheduled_dt.replace(second=0)
     scheduled_dt = scheduled_dt.replace(microsecond=0)
 
     # if the new time is before the interval has elapsed, push forward 1 day
-    if scheduled_dt < starting_at + timedelta(minutes=minutes_till_next_scheduled_event):
+    if scheduled_dt < starting_at + timedelta(minutes=minutes_between_executions):
         scheduled_dt = scheduled_dt + timedelta(days=1)
 
     current_dt = datetime.now(timezone.utc)
@@ -89,21 +89,6 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, int
         scheduled_dt = scheduled_dt + timedelta(days=1)
 
     return scheduled_dt
-
-
-def get_next_schd_using_interval(schedule: IOTDeviceSchedule):
-    """
-    Given a schedule, calculate the next scheduled time using the interval
-    :param schedule: IOTDeviceSchedule
-    :return: datetime.datetime of the next scheduled run
-    """
-
-    current_dt = datetime.now(timezone.utc)
-    next_scheduled_dt = add_minutes_to_dt(schedule.next_execution, schedule.interval_minutes)
-    while next_scheduled_dt < current_dt:
-        next_scheduled_dt = add_minutes_to_dt(next_scheduled_dt, schedule.interval_minutes)
-
-    return next_scheduled_dt
 
 
 def add_minutes_to_dt(dt: datetime, minutes: int) -> datetime:

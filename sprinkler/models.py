@@ -81,6 +81,27 @@ class IOTDevice(BaseModel):
 
         return pending_schedules, future_schedules_today
 
+    def should_be_awake_later_today(self):
+        pending_schedules, future_schedules = self.today_active_schedules()
+
+        if future_schedules:
+            return True
+
+        return False
+
+    def should_be_awake_now(self):
+        """
+        Returns True if device should be awake now.  During this period,
+        the device should be listening for commands.  This allows manual control.
+        :return: Boolean
+        """
+
+        # always stay online if that is configured
+        if self.stay_awake:
+            return True
+
+        return False
+
     def __str__(self):
         return f"{self.device_id} - {self.name}"
 
@@ -101,9 +122,6 @@ class IOTDeviceSchedule(BaseModel):
     # minute.  Only one of the two should be populated
     hour = models.IntegerField()
     minute = models.IntegerField()
-
-    # if this is populated, schedule initially starts at above value then repeats every interval_minutes
-    interval_minutes = models.IntegerField() # TODO: get rid of this nonsense
 
     # this will be managed by the automation
     next_execution = models.DateTimeField(auto_now=False)

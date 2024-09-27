@@ -13,8 +13,6 @@ def create_device(device_id=0, device_name="test", cal_low_pressure_ticks=50, ca
                                       cal_low_voltage=10,
                                       cal_high_voltage=13,
                                       cal_low_pressure_ticks=cal_low_pressure_ticks,
-                                      cal_high_pressure_ticks=cal_high_pressure_ticks,
-                                      ipv4_address=1,
-                                      port=1)
+                                      cal_high_pressure_ticks=cal_high_pressure_ticks)
 
     return device

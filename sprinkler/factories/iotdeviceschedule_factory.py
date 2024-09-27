@@ -10,7 +10,6 @@ def create_schedule_zero_hour_minute(device: IOTDevice, next_execution: datetime
                                                 minute=0,
                                                 next_execution=next_execution,
                                                 active=True,
-                                                interval_minutes=0,
                                                 schedule_type=schedule_type)
 
     return schedule
