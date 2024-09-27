@@ -1,4 +1,4 @@
-from sprinkler.models import IOTDevice
+from sprinkler.models import ServerToDeviceCommand
 from datetime import datetime, timezone
 from sprinkler.service.schedule_service import execute_scheduled_tasks
 from util.automation_utils import get_voltage_from_ticks_and_cal
@@ -84,7 +84,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
     if transmitting_device.should_be_awake_later_today():
         payload = {
             'device_id': device_id,
-            'command': sprinkler_constants.COMMAND_SLEEP,
+            'command': ServerToDeviceCommand.SLEEP.value,
             'body': {
                 'sleep_length_minutes': "60" # TODO: scale this so it wakes up right after the scheduled task
             }
@@ -97,7 +97,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
     print(f"Telling device {device_id} to turn off")
     payload = {
         'device_id': device_id,
-        'command': sprinkler_constants.COMMAND_POWER_OFF,
+        'command': ServerToDeviceCommand.POWER_OFF.value,
     }
 
     message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))

@@ -107,6 +107,17 @@ class ScheduleTypes(models.TextChoices):
     SPRINKLE = 'sprinkle'
 
 
+class ServerToDeviceCommand(models.TextChoices):
+    STATUS = 'status'
+    SPRINKLE_START = 'sprinkle_start'
+    SPRINKLE_ON = 'sprinkle_on'
+    SPRINKLE_OFF = 'sprinkle_off'
+    SLEEP = "sleep_now"
+    SWITCH_BROKER_DEBUG = "switch_broker_debug"
+    SWITCH_BROKER_PROD = "switch_broker_prod"
+    POWER_OFF = "power_off"
+
+
 # Device-specific schedule configuration
 class IOTDeviceSchedule(BaseModel):
 

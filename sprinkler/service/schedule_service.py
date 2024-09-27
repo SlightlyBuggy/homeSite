@@ -2,7 +2,6 @@ from sprinkler.models import IOTDeviceSchedule, ScheduleTypes, IOTDevice
 from datetime import datetime, timezone
 from sprinkler.service import command_service
 import util.automation_utils as util
-from typing import List
 
 
 def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):

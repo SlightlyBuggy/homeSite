@@ -1,6 +1,6 @@
 import util.automation_utils as util
 import sprinkler.mqtt as mqtt
-from sprinkler.models import IOTDeviceSchedule, IOTDevice
+from sprinkler.models import IOTDeviceSchedule, IOTDevice, ServerToDeviceCommand
 from datetime import datetime, timezone
 from django.views.decorators.csrf import csrf_exempt
 from sprinkler import constants
@@ -17,7 +17,7 @@ def handle_status_command(device: IOTDevice):
 
     status_body = {
         'device_id': device.device_id,
-        'command': constants.COMMAND_STATUS
+        'command': ServerToDeviceCommand.STATUS.value
     }
 
     mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, status_body)
@@ -46,7 +46,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
     # if we've gotten here, we need to command the device to start watering
     water_body = {
         'device_id': device.device_id,
-        'command': constants.COMMAND_SPRINKLE_START,
+        'command': ServerToDeviceCommand.SPRINKLE_START.value,
         'body': {
             'watering_length_minutes': str(device.watering_length_minutes),
             'watering_wait_minutes': str(device.watering_wait_minutes),

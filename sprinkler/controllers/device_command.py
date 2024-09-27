@@ -1,6 +1,8 @@
 import json
 from django.views.decorators.csrf import csrf_exempt
 import sprinkler.mqtt as mqtt
+from sprinkler.models import ServerToDeviceCommand
+import sprinkler.constants as constants
 
 # TODO: validation for all requests
 # TODO: fix so we don't do csrf_exempt
@@ -12,9 +14,9 @@ def status(request):
 
     device_id = request_data['device_id']
 
-    test_payload = {'device_id': device_id, 'command': mqtt.COMMAND_STATUS, 'body': {}}
+    test_payload = {'device_id': device_id, 'command': ServerToDeviceCommand.STATUS, 'body': {}}
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -26,7 +28,7 @@ def sprinkle_start(request):
 
     test_payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SPRINKLE_START,
+        'command': ServerToDeviceCommand.SPRINKLE_START.value,
         'body': {}
     }
 
@@ -43,7 +45,7 @@ def sprinkle_start(request):
     if 'watering_repetitions' in request_data:
         test_payload['body']['watering_repetitions'] = request_data['watering_repetitions']
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -55,10 +57,10 @@ def sprinkle_on(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SPRINKLE_ON
+        'command': ServerToDeviceCommand.SPRINKLE_ON.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -70,10 +72,10 @@ def sprinkle_off(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SPRINKLE_OFF
+        'command': ServerToDeviceCommand.SPRINKLE_OFF.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -89,13 +91,13 @@ def sleep_now(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SLEEP,
+        'command': ServerToDeviceCommand.SLEEP.value,
         'body': {
             'sleep_length_minutes': str(sleep_length_minutes)
         }
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -107,10 +109,10 @@ def switch_broker_debug(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SWITCH_BROKER_DEBUG
+        'command': ServerToDeviceCommand.SWITCH_BROKER_DEBUG.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -122,10 +124,10 @@ def switch_broker_prod(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_SWITCH_BROKER_PROD
+        'command': ServerToDeviceCommand.SWITCH_BROKER_PROD.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 @csrf_exempt
@@ -135,10 +137,10 @@ def power_off(request):
 
     payload = {
         'device_id': device_id,
-        'command': mqtt.COMMAND_POWER_OFF
+        'command': ServerToDeviceCommand.POWER_OFF.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(mqtt.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
