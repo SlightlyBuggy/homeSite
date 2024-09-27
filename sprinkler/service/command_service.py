@@ -57,9 +57,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
     mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, water_body)
 
     # update the schedule
-    schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt,
-                                                                  minutes_between_executions=
-                                                                  device.minimum_water_interval_hours*60)
+    schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt)
     schedule.save()
 
     # create and save the schedule_execution object

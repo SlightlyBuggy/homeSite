@@ -22,8 +22,8 @@ class ScheduleServiceTest(TestCase):
     def test_execute_scheduled_task_past_can_sprinkle(self):
 
         # make a schedule one hour in the past
-        test_schedule = iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                                           next_execution=self.one_hour_ago)
+        test_schedule = iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                                  next_execution=self.one_hour_ago)
 
         executed_tasks = schedule_service.execute_scheduled_tasks(device=self.test_device, can_sprinkle=True)
 
@@ -42,8 +42,8 @@ class ScheduleServiceTest(TestCase):
     def test_execute_scheduled_tasks_past_cannot_sprinkle(self):
 
         # make a schedule one hour in the past
-        test_schedule = iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                                           next_execution=self.one_hour_ago)
+        test_schedule = iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                                  next_execution=self.one_hour_ago)
 
         executed_tasks = schedule_service.execute_scheduled_tasks(device=self.test_device, can_sprinkle=False)
 
@@ -58,8 +58,8 @@ class ScheduleServiceTest(TestCase):
     def test_execute_scheduled_tasks_future_can_sprinkle(self):
 
         # make a schedule one hour in the future
-        test_schedule = iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                                           next_execution=self.one_hour_from_now)
+        test_schedule = iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                                  next_execution=self.one_hour_from_now)
 
         executed_tasks = schedule_service.execute_scheduled_tasks(device=self.test_device, can_sprinkle=True)
 
@@ -74,8 +74,8 @@ class ScheduleServiceTest(TestCase):
     def test_execute_scheduled_tasks_future_cannot_sprinkle(self):
 
         # make a schedule one hour in the future
-        test_schedule = iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                                           next_execution=self.one_hour_from_now)
+        test_schedule = iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                                  next_execution=self.one_hour_from_now)
 
         executed_tasks = schedule_service.execute_scheduled_tasks(device=self.test_device, can_sprinkle=False)
 
@@ -88,8 +88,8 @@ class ScheduleServiceTest(TestCase):
         self.assertEquals(len(test_device_schedule_executions), 0)
 
     def test_update_next_sprinkle_execution_no_change(self):
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=self.one_hour_from_now)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=self.one_hour_from_now)
 
         schedule_service.update_sprinkle_schedules()
 
@@ -98,8 +98,8 @@ class ScheduleServiceTest(TestCase):
         self.assertEquals(self.one_hour_from_now, test_schedule.next_execution)
 
     def test_update_next_sprinkle_execution_water_in_progress(self):
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=self.one_hour_ago)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=self.one_hour_ago)
 
         rainlog_factory.create_rain_log_in_progress()
 
@@ -108,7 +108,7 @@ class ScheduleServiceTest(TestCase):
         test_schedule: IOTDeviceSchedule = IOTDeviceSchedule.objects.filter(device=self.test_device)[0]
 
         # the new execution should have been calculated from the current time and use the full interval
-        interval_hours = self.test_device.minimum_water_interval_hours
+        interval_hours = test_schedule.minimum_hours_between_executions
 
         # create bounding for the next execution.  the schedule service ensures the minimum interval is always respected
         # and will push the schedule forward by a day if needed to achieve that
@@ -124,8 +124,8 @@ class ScheduleServiceTest(TestCase):
 
     def test_update_next_sprinkle_execution_water_finished_one_hour_ago(self):
 
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=self.one_hour_from_now)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=self.one_hour_from_now)
 
         rainlog_factory.create_rain_log_finished_one_hour_ago()
 
@@ -134,7 +134,7 @@ class ScheduleServiceTest(TestCase):
         test_schedule: IOTDeviceSchedule = IOTDeviceSchedule.objects.filter(device=self.test_device)[0]
 
         # the new execution should have been calculated from the current time and use the full interval
-        interval_hours = self.test_device.minimum_water_interval_hours
+        interval_hours = test_schedule.minimum_hours_between_executions
 
         # create bounding for the next execution.  the schedule service ensures the minimum interval is always respected
         # and will push the schedule forward by a day if needed to achieve that

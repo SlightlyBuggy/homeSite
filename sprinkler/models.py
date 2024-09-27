@@ -27,10 +27,6 @@ class IOTDevice(BaseModel):
     num_barrels = models.IntegerField(null=True)
     barrel_cross_sectional_area_in2 = models.FloatField(null=True)
 
-    # watering configuration
-    # minimum time to wait between water events before trying to water
-    minimum_water_interval_hours = models.IntegerField()
-
     # watering config
     # to allow the soil to absorb water, the sprinkler will run for watering_length_minutes, then wait for
     # watering_wait_minutes, and do that watering_repetitions times
@@ -128,6 +124,9 @@ class IOTDeviceSchedule(BaseModel):
 
     # whether to consider this schedule
     active = models.BooleanField(default=False)
+
+    # minimum time to wait between executions of this schedule
+    minimum_hours_between_executions = models.IntegerField(default=168)
 
     def __str__(self):
         return f"{self.device} - {self.schedule_type}"

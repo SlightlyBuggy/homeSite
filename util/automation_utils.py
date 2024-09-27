@@ -51,18 +51,16 @@ def get_last_watering_end_time_and_watering_status(device_id) -> tuple[any, bool
     return last_sprinkler_or_rain_end, currently_raining or currently_sprinkling
 
 
-def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, minutes_between_executions=None):
+def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at):
     """
     Given a schedule, starting time, and optional interval, compute the next time the schedule should be
     evaluated, respecting the start hour and minute
     :param: schedule: IOTDeviceSchedule
     :param: starting_at: datetime.datetime from which next execution should be calculated
-    :param: minutes_between_executions: number of minutes between executions of this particular schedule
     :return: datetime.datetime of the next scheduled run
     """
 
-    # TODO: move the minutes between executions to the DeviceSchedule object
-    scheduled_dt = starting_at + timedelta(minutes=minutes_between_executions)
+    scheduled_dt = starting_at + timedelta(hours=schedule.minimum_hours_between_executions)
 
     # make sure the schedule's hour/minute are respected
     if schedule.hour:
@@ -78,7 +76,7 @@ def get_next_schd_using_start_time(schedule: IOTDeviceSchedule, starting_at, min
     scheduled_dt = scheduled_dt.replace(microsecond=0)
 
     # if the new time is before the interval has elapsed, push forward 1 day
-    if scheduled_dt < starting_at + timedelta(minutes=minutes_between_executions):
+    if scheduled_dt < starting_at + timedelta(hours=schedule.minimum_hours_between_executions):
         scheduled_dt = scheduled_dt + timedelta(days=1)
 
     current_dt = datetime.now(timezone.utc)

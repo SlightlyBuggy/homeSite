@@ -3,7 +3,6 @@ from sprinkler.models import IOTDevice
 
 def create_device(device_id=0, device_name="test", cal_low_pressure_ticks=50, cal_high_pressure_ticks=100) -> IOTDevice:
     device = IOTDevice.objects.create(name=device_name,
-                                      minimum_water_interval_hours=168,
                                       watering_length_minutes=10,
                                       watering_wait_minutes=5,
                                       watering_repetitions=2,

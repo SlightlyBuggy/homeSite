@@ -42,8 +42,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the past
         one_hour_ago = datetime.now(timezone.utc) + timedelta(hours=-1)
 
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=one_hour_ago)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=one_hour_ago)
 
         device_service.handle_device_status(0, test_status, self.fake_mqtt_message_sender)
 
@@ -59,8 +59,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the future
         one_hour_ago = datetime.now(timezone.utc) + timedelta(hours=1)
 
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=one_hour_ago)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=one_hour_ago)
 
         device_service.handle_device_status(0, test_status, self.fake_mqtt_message_sender)
 
@@ -76,8 +76,8 @@ class DeviceServiceTest(TestCase):
         # create a sprinkle event that's in the future
         one_hour_ago = datetime.now(timezone.utc) + timedelta(days=2)
 
-        iotdeviceschedule_factory.create_sprinkle_schedule(device=self.test_device,
-                                                           next_execution=one_hour_ago)
+        iotdeviceschedule_factory.create_weekly_sprinkle_schedule(device=self.test_device,
+                                                                  next_execution=one_hour_ago)
 
         device_service.handle_device_status(device_id=0, status=test_status,
                                             message_sender=self.fake_mqtt_message_sender)
