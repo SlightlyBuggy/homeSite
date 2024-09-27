@@ -13,8 +13,8 @@ class BaseModel(models.Model):
         abstract = True
 
 
-# device.  Prototype is planned to have a water level sensor and watering pump
-class Device(BaseModel):
+# IOT device
+class IOTDevice(BaseModel):
 
     name = models.CharField(max_length=200)
 
@@ -61,19 +61,6 @@ class Device(BaseModel):
     # override to allow manual control
     stay_awake = models.BooleanField(default=False)
 
-    class Meta:
-        abstract = True
-
-
-# include properties specific to a connected device.  All devices should be connected, but this is a nice abstraction
-class IOTDevice(Device):
-
-    def __str__(self):
-        return f"{self.device_id} - {self.name}"
-
-    ipv4_address = models.CharField(max_length=15)
-    port = models.IntegerField()
-
     def get_latest_status(self):
         try:
             return self.devicestatuslog_set.all().order_by('-created')[0]
@@ -94,26 +81,8 @@ class IOTDevice(Device):
 
         return pending_schedules, future_schedules_today
 
-    def should_be_awake_later_today(self):
-        pending_schedules, future_schedules = self.today_active_schedules()
-
-        if future_schedules:
-            return True
-
-        return False
-
-    def should_be_awake_now(self):
-        """
-        Returns True if device should be awake now.  During this period,
-        the device should be listening for commands.  This allows manual control.
-        :return: Boolean
-        """
-
-        # always stay online if that is configured
-        if self.stay_awake:
-            return True
-
-        return False
+    def __str__(self):
+        return f"{self.device_id} - {self.name}"
 
 
 # types of schedules
