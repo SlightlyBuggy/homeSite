@@ -1,6 +1,6 @@
 import json
 from django.views.decorators.csrf import csrf_exempt
-import sprinkler.mqtt as mqtt
+import sprinkler.service.mqtt_service as mqtt
 from sprinkler.models import ServerToDeviceCommand
 import sprinkler.constants as constants
 

@@ -5,6 +5,8 @@ from django.http import JsonResponse
 import sprinkler.constants as spinkler_constants
 from sprinkler.service.device_service import handle_device_status
 
+client = None
+
 
 def on_message(mqtt_client, userdata, msg):
     print(f'Received message on topic: {msg.topic} with payload: {msg.payload}')
@@ -54,24 +56,30 @@ def on_disconnect(mqtt_client, userdata, rc):
         print(f"Unexpected disconnect from mqtt broker with code {rc}")
 
 
-client = mqtt.Client()
-client.on_connect = on_connect
-client.on_message = on_message
-client.on_disconnect = on_disconnect
-client.message_callback_add('device_status', on_device_status)
-client.message_callback_add('device_message', on_device_message)
-client.message_callback_add('sprinkle_start', on_sprinkle_start)
-client.message_callback_add('sprinkle_end', on_sprinkle_end)
-client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
-client.connect(
-    host=settings.MQTT_SERVER,
-    port=settings.MQTT_PORT,
-    keepalive=settings.MQTT_KEEPALIVE
-)
+def init_mqtt():
+    global client
+    client = mqtt.Client()
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.on_disconnect = on_disconnect
+    client.message_callback_add('device_status', on_device_status)
+    client.message_callback_add('device_message', on_device_message)
+    client.message_callback_add('sprinkle_start', on_sprinkle_start)
+    client.message_callback_add('sprinkle_end', on_sprinkle_end)
+    client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
+    client.connect(
+        host=settings.MQTT_SERVER,
+        port=settings.MQTT_PORT,
+        keepalive=settings.MQTT_KEEPALIVE
+    )
+    client.loop_start()
 
 
 def send_mqtt_message(topic, body) -> JsonResponse:
     # TODO: validate message
+
+    if not client:
+        raise Exception("mqtt client has not been initialized")
 
     # cast body to string if needed
     if not type(body) == str:

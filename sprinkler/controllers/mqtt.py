@@ -1,5 +1,5 @@
 import json
-import sprinkler.mqtt as mqtt
+import sprinkler.service.mqtt_service as mqtt
 
 
 # TODO: make these get/post/put only as needed

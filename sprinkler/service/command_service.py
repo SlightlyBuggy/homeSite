@@ -1,5 +1,5 @@
 import util.automation_utils as util
-import sprinkler.mqtt as mqtt
+import sprinkler.service.mqtt_service as mqtt
 from sprinkler.models import IOTDeviceSchedule, IOTDevice, ServerToDeviceCommand
 from datetime import datetime, timezone
 from django.views.decorators.csrf import csrf_exempt

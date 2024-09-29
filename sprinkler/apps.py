@@ -9,6 +9,6 @@ class SprinklerConfig(AppConfig):
     # or use test topics
     # or have a test instance of the broker?
     def ready(self):
-        from sprinkler import mqtt
+        from sprinkler.service import mqtt_service as mqtt
 
-        mqtt.client.loop_start()
+        mqtt.init_mqtt()
