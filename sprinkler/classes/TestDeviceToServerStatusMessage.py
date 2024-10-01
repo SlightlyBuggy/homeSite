@@ -1,5 +1,5 @@
 from django.test import TestCase
-from sprinkler.classes.DeviceToServerStatusMessage import DeviceToServerStatusMessage
+from sprinkler.classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
 from sprinkler.service import mqtt_service
 import json
 
@@ -24,7 +24,7 @@ class TestDeviceToServerStatusMessage(TestCase):
 
         fake_message = FakeRawMessage(self.test_topic, json.dumps(payload))
         try:
-            DeviceToServerStatusMessage(fake_message)
+            ParsedDeviceToServerStatusMessage(fake_message)
         except Exception as e:
             self.fail(f"Unexpected exception thrown when parsing good message")
 
@@ -37,7 +37,7 @@ class TestDeviceToServerStatusMessage(TestCase):
 
         fake_message = FakeRawMessage(None, json.dumps(payload))
 
-        self.assertRaises(AttributeError, DeviceToServerStatusMessage, fake_message)
+        self.assertRaises(AttributeError, ParsedDeviceToServerStatusMessage, fake_message)
 
     def test_missing_payload(self):
 
@@ -48,6 +48,6 @@ class TestDeviceToServerStatusMessage(TestCase):
 
         fake_message = FakeRawMessage(self.test_topic, None)
 
-        self.assertRaises(AttributeError, DeviceToServerStatusMessage, fake_message)
+        self.assertRaises(AttributeError, ParsedDeviceToServerStatusMessage, fake_message)
 
     # TODO: finish build out

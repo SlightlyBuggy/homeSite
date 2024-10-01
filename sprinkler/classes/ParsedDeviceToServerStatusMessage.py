@@ -1,7 +1,7 @@
 import json
 
 
-class DeviceToServerStatusMessage:
+class ParsedDeviceToServerStatusMessage:
     def __init__(self, raw_message):
         self.raw_message = raw_message
 

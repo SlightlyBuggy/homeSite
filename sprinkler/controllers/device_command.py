@@ -16,7 +16,7 @@ def status(request):
 
     test_payload = {'device_id': device_id, 'command': ServerToDeviceCommand.STATUS, 'body': {}}
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -45,7 +45,7 @@ def sprinkle_start(request):
     if 'watering_repetitions' in request_data:
         test_payload['body']['watering_repetitions'] = request_data['watering_repetitions']
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(test_payload))
     return mqtt_response
 
 
@@ -60,7 +60,7 @@ def sprinkle_on(request):
         'command': ServerToDeviceCommand.SPRINKLE_ON.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -75,7 +75,7 @@ def sprinkle_off(request):
         'command': ServerToDeviceCommand.SPRINKLE_OFF.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -97,7 +97,7 @@ def sleep_now(request):
         }
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -112,7 +112,7 @@ def switch_broker_debug(request):
         'command': ServerToDeviceCommand.SWITCH_BROKER_DEBUG.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 
@@ -127,7 +127,7 @@ def switch_broker_prod(request):
         'command': ServerToDeviceCommand.SWITCH_BROKER_PROD.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 @csrf_exempt
@@ -140,7 +140,7 @@ def power_off(request):
         'command': ServerToDeviceCommand.POWER_OFF.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, str(payload))
     return mqtt_response
 
 

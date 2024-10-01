@@ -37,7 +37,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
     """
     voltage_ticks = None
     voltage = None
-
+    # TODO: need an actual interface for the status and an object taht does the validation and whatever
     if 'voltage_ticks' in status:
         voltage_ticks = status['voltage_ticks']
         devices_with_device_id: list[IOTDevice] = IOTDevice.objects.filter(device_id=device_id)[:1]

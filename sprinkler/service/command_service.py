@@ -20,7 +20,7 @@ def handle_status_command(device: IOTDevice):
         'command': ServerToDeviceCommand.STATUS.value
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, status_body)
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, status_body)
     return
 
 
@@ -54,7 +54,7 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
         }
     }
 
-    mqtt_response = mqtt.send_mqtt_message(constants.COMMAND_TOPIC, water_body)
+    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, water_body)
 
     # update the schedule
     schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt)

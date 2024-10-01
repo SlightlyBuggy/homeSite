@@ -1,5 +1,5 @@
-from AbstractMqttClient import AbstractMqttClient
-from sprinkler.classes.DeviceToServerStatusMessage import DeviceToServerStatusMessage
+from sprinkler.classes.AbstractMqttClient import AbstractMqttClient
+from sprinkler.classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
 import sprinkler.constants as spinkler_constants
 from sprinkler.service.device_service import handle_device_status
 import paho.mqtt.client as mqtt
@@ -16,12 +16,12 @@ class RealMqttClient(AbstractMqttClient):
 
     def on_device_status(self, mqtt_client, userdata, msg):
 
-        parsed_message = DeviceToServerStatusMessage(msg)
+        parsed_message = ParsedDeviceToServerStatusMessage(msg)
 
         handle_device_status(parsed_message.device_id, parsed_message.status, self.send_mqtt_message)
 
     def on_device_status(self, mqtt_client, userdata, msg):
-        parsed_message = DeviceToServerStatusMessage(msg)
+        parsed_message = ParsedDeviceToServerStatusMessage(msg)
 
         handle_device_status(parsed_message.device_id, parsed_message.status, self.send_mqtt_message)
 

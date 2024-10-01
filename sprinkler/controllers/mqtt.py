@@ -8,5 +8,5 @@ def publish_message(request):
     # TODO: validate request body
     request_data = json.loads(request.body)
 
-    mqtt_response = mqtt.send_mqtt_message(request_data['topic'], request_data['body'])
+    mqtt_response = mqtt.client.send_mqtt_message(request_data['topic'], request_data['body'])
     return mqtt_response
