@@ -4,29 +4,10 @@ from sprinkler.service.schedule_service import execute_scheduled_tasks
 from util.automation_utils import get_voltage_from_ticks_and_cal
 from sprinkler.models import DeviceStatusLog, IOTDevice
 import sprinkler.constants as sprinkler_constants
+import sprinkler.service.mqtt_service as mqtt
 
 
-def should_device_be_awake(device: IOTDevice):
-    """
-    Return true if the device should be awake
-    :param device: IOTDevice
-    :return: boolean
-    """
-    hour_awake_start = device.time_awake_start_hour_utc
-    hour_awake_end = device.time_awake_stop_hour_utc
-
-    if hour_awake_end == hour_awake_end:
-        return True
-
-    dt_awake_start = datetime.now(timezone.utc).replace(hour=hour_awake_start, minute=0, second=0, microsecond=0)
-    dt_awake_end = datetime.now(timezone.utc).replace(hour=hour_awake_end, minute=0, second=0, microsecond=0)
-
-    current_dt = datetime.now(timezone.utc)
-
-    return dt_awake_start < current_dt < dt_awake_end
-
-
-def handle_device_status(device_id, status, message_sender) -> None:
+def handle_device_status(device_id, status) -> None:
     """
     Take appropriate action when a device reports its status
 
@@ -90,7 +71,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
             }
         }
 
-        return message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))
+        return mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
 
     # if we've made it here, the device doesn't have any tasks to accomplish now, doesn't need to be awake now,
     # doesn't need to be awake later, and has no tasks later.  It should be shut off for the day
@@ -100,9 +81,7 @@ def handle_device_status(device_id, status, message_sender) -> None:
         'command': ServerToDeviceCommand.POWER_OFF.value,
     }
 
-    message_sender(sprinkler_constants.COMMAND_TOPIC, str(payload))
-
-    return
+    return mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
 
 
 def device_measured_enough_water_to_sprinkle_from_last_status(device: IOTDevice) -> bool:

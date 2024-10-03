@@ -1,4 +1,5 @@
 import json
+import ast
 
 
 class ParsedDeviceToServerStatusMessage:
@@ -33,7 +34,7 @@ class ParsedDeviceToServerStatusMessage:
 
         try:
             payload = json.loads(self.raw_message.payload)
-        except TypeError as e:
+        except (TypeError, json.JSONDecodeError) as e:
             raise TypeError(f"Unable to parse raw message: {self.raw_message}")
         except AttributeError as e:
             raise AttributeError(f"Raw message missing 'payload' attribute: {self.raw_message}")

@@ -1,6 +1,6 @@
 from sprinkler.classes.AbstractMqttClient import AbstractMqttClient
-from sprinkler.classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
-from sprinkler.classes.RawDeviceToServerStatusMessage import RawDeviceToServerStatusMessage
+from sprinkler.classes.test_classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
+from sprinkler.classes.test_classes.MockDeviceToServerStatusMessage import RawDeviceToServerStatusMessage
 from sprinkler.service.device_service import handle_device_status
 from sprinkler.constants import COMMAND_TOPIC
 from sprinkler.models import ServerToDeviceCommand
@@ -19,12 +19,12 @@ class FakeMqttClient(AbstractMqttClient):
 
         parsed_message = ParsedDeviceToServerStatusMessage(msg)
 
-        handle_device_status(parsed_message.device_id, parsed_message.status, self.send_mqtt_message)
+        handle_device_status(parsed_message.device_id, parsed_message.status)
 
     def on_device_status(self, mqtt_client, userdata, msg):
         parsed_message = ParsedDeviceToServerStatusMessage(msg)
 
-        handle_device_status(parsed_message.device_id, parsed_message.status, self.send_mqtt_message)
+        handle_device_status(parsed_message.device_id, parsed_message.status)
 
     def on_connect(self, mqtt_client, userdata, flags, rc):
         pass
@@ -63,13 +63,13 @@ class FakeMqttClient(AbstractMqttClient):
         except KeyError:
             raise KeyError(f"Missing 'device_id' from body {body}")
 
-        raw_device_to_server_message = RawDeviceToServerStatusMessage(topic=topic, device_id=device_id)
-
         # TODO: this should hand off to a device mocker
-
         # TODO: uncle bob says these should be hidden behind an abstract factory.  maybe we can do that later.
+        # given the command we are going to send, craft the response we expect to see from the device and send
+        # that to the appropriate handler
         match command:
             case ServerToDeviceCommand.STATUS.value:
+                raw_device_to_server_message = RawDeviceToServerStatusMessage(topic=topic, device_id=device_id)
                 self.on_device_status(None, None, raw_device_to_server_message)
             case ServerToDeviceCommand.SLEEP.value:
                 self.handle_command_without_response(command)

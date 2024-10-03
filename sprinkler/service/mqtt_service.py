@@ -1,5 +1,5 @@
 from sprinkler.classes.RealMqttClient import RealMqttClient
-from sprinkler.classes.FakeMqttClient import FakeMqttClient
+from sprinkler.classes.test_classes.FakeMqttClient import FakeMqttClient
 
 
 client = None

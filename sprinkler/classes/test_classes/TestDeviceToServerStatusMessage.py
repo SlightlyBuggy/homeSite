@@ -1,6 +1,5 @@
 from django.test import TestCase
-from sprinkler.classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
-from sprinkler.service import mqtt_service
+from sprinkler.classes.test_classes.ParsedDeviceToServerStatusMessage import ParsedDeviceToServerStatusMessage
 import json
 
 
