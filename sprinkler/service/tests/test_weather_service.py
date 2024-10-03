@@ -10,7 +10,8 @@ class WeatherServiceTest(TestCase):
     def get_test_file_path():
         this_dir = os.path.dirname(os.path.realpath(__file__))
         parent_dir = os.path.dirname(this_dir)
-        test_file_path = os.path.join(parent_dir, 'resources', 'precip_observations_test_data.json')
+        parent_of_parent = os.path.dirname(parent_dir)
+        test_file_path = os.path.join(parent_of_parent, 'resources', 'precip_observations_test_data.json')
         return test_file_path
 
     def test_get_and_record_precip_observations_no_schedules(self):

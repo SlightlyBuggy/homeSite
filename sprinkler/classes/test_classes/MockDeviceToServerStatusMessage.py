@@ -1,10 +1,11 @@
 import json
+from sprinkler.constants import COMMAND_TOPIC
 
 
-class RawDeviceToServerStatusMessage:
-    def __init__(self, topic, device_id=None, status=None):
+class MockDeviceToServerStatusMessage:
+    def __init__(self, device_id=None, status=None):
 
-        self.topic = topic
+        self.topic = COMMAND_TOPIC
         payload = {}
 
         if device_id is not None:
