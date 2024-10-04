@@ -6,6 +6,7 @@ from sprinkler.constants import COMMAND_TOPIC
 from sprinkler.models import ServerToDeviceCommand
 
 
+# TODO: need to find a way to test real mqtt client as well, just to verify it starts properly and can send a message
 class TestMqttService(TestCase):
 
     test_device: IOTDevice

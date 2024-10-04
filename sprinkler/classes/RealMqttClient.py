@@ -37,17 +37,17 @@ class RealMqttClient(AbstractMqttClient):
             print(f"Unexpected disconnect from mqtt broker with code {rc}")
 
     def init_mqtt(self):
-        client = mqtt.Client()
-        client.on_connect = self.on_connect
-        client.on_disconnect = self.on_disconnect
-        client.message_callback_add(spinkler_constants.DEVICE_STATUS_TOPIC, self.on_device_status)
-        client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
-        client.connect(
+        self.client = mqtt.Client()
+        self.client.on_connect = self.on_connect
+        self.client.on_disconnect = self.on_disconnect
+        self.client.message_callback_add(spinkler_constants.DEVICE_STATUS_TOPIC, self.on_device_status)
+        self.client.username_pw_set(settings.MQTT_USER, settings.MQTT_PASSWORD)
+        self.client.connect(
             host=settings.MQTT_SERVER,
             port=settings.MQTT_PORT,
             keepalive=settings.MQTT_KEEPALIVE
         )
-        client.loop_start()
+        self.client.loop_start()
 
     def send_mqtt_message(self, topic, body) -> JsonResponse:
         # TODO: validate message
