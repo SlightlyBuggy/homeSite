@@ -30,7 +30,7 @@ class DeviceStatus:
 
     def _calculate_voltage_from_status(self):
 
-        device: IOTDevice = device_service.get_device_by_id(self.device_id)
+        device: IOTDevice = device_service.get_device_by_device_id(self.device_id)
 
         if not device:
             raise Exception(f"Device with id {self.device_id} not found")

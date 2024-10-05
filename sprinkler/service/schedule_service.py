@@ -22,7 +22,7 @@ def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
         # check if schedule should be executed now
         if active_schedule.next_execution <= current_dt:
 
-            device: IOTDevice = device_service.get_device_by_id(active_schedule.device.id)
+            device: IOTDevice = device_service.get_device_by_device_id(active_schedule.device.device_id)
 
             # handle each schedule type
             match active_schedule.schedule_type:

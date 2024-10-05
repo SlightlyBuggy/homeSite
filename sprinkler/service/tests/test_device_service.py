@@ -82,7 +82,7 @@ class DeviceServiceTest(TestCase):
 
     def test_enough_water_to_sprinkle_on_threshold(self):
 
-        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
+        test_device: IOTDevice = device_service.get_device_by_device_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -96,7 +96,7 @@ class DeviceServiceTest(TestCase):
         self.assertTrue(enough_water)
 
     def test_enough_water_to_sprinkle_has_enough_in_range(self):
-        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
+        test_device: IOTDevice = device_service.get_device_by_device_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -113,7 +113,7 @@ class DeviceServiceTest(TestCase):
 
     def test_enough_water_to_sprinkle_not_enough_in_range(self):
 
-        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
+        test_device: IOTDevice = device_service.get_device_by_device_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -128,7 +128,7 @@ class DeviceServiceTest(TestCase):
         self.assertFalse(enough_water)
 
     def test_enough_water_to_sprinkle_not_enough_out_of_range(self):
-        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
+        test_device: IOTDevice = device_service.get_device_by_device_id(self.test_device_id)
 
         ticks_to_test = test_device.cal_low_pressure_ticks - 1
 
@@ -140,7 +140,7 @@ class DeviceServiceTest(TestCase):
         self.assertFalse(enough_water)
 
     def test_enough_water_to_sprinkle_has_enough_out_of_range(self):
-        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
+        test_device: IOTDevice = device_service.get_device_by_device_id(self.test_device_id)
 
         ticks_to_test = test_device.cal_high_pressure_ticks + 1
 

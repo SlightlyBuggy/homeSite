@@ -8,7 +8,7 @@ from sprinkler.classes.ParsedDeviceStatus import DeviceStatus
 
 def handle_device_status(device_id, status) -> None:
 
-    transmitting_device = get_device_by_id(device_id)
+    transmitting_device = get_device_by_device_id(device_id)
     device_status: DeviceStatus = DeviceStatus(device_id, status)
 
     if not transmitting_device:
@@ -66,7 +66,7 @@ def get_minimum_measured_ticks(device: IOTDevice):
     return min_ticks
 
 
-def get_device_by_id(device_id: int) -> IOTDevice | None:
+def get_device_by_device_id(device_id: int) -> IOTDevice | None:
     device: IOTDevice | None = IOTDevice.objects.filter(device_id=device_id).first()
 
     return device
