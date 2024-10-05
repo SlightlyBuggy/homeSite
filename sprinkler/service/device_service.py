@@ -1,115 +1,128 @@
 from sprinkler.models import ServerToDeviceCommand
-from datetime import datetime, timezone
 from sprinkler.service.schedule_service import execute_scheduled_tasks
-from util.automation_utils import get_voltage_from_ticks_and_cal
 from sprinkler.models import DeviceStatusLog, IOTDevice
 import sprinkler.constants as sprinkler_constants
 import sprinkler.service.mqtt_service as mqtt
+from sprinkler.classes.ParsedDeviceStatus import DeviceStatus
 
 
 def handle_device_status(device_id, status) -> None:
-    """
-    Take appropriate action when a device reports its status
 
-    :param device_id: IOTDevice
-    :param status: status object from device
-    :param message_sender:
-    :return:
-    """
-    voltage_ticks = None
-    voltage = None
-    # TODO: need an actual interface for the status and an object taht does the validation and whatever
-    if 'voltage_ticks' in status:
-        voltage_ticks = status['voltage_ticks']
-        devices_with_device_id: list[IOTDevice] = IOTDevice.objects.filter(device_id=device_id)[:1]
-
-        if devices_with_device_id:
-            this_device: IOTDevice = devices_with_device_id[0]
-            voltage = get_voltage_from_ticks_and_cal(input_ticks=voltage_ticks,
-                                                     cal_low_ticks=this_device.cal_low_ticks_voltage,
-                                                     cal_low_voltage=this_device.cal_low_voltage,
-                                                     cal_high_ticks=this_device.cal_high_ticks_voltage,
-                                                     cal_high_voltage=this_device.cal_high_voltage)
-
-    # handle water pressure
-    water_pressure_ticks = None
-    if 'pressure_ticks' in status:
-        water_pressure_ticks = status['pressure_ticks']
-
-    transmitting_device = IOTDevice.objects.get(device_id=device_id)
+    transmitting_device = get_device_by_id(device_id)
+    device_status: DeviceStatus = DeviceStatus(device_id, status)
 
     if not transmitting_device:
         print(f"Unable to handle device status message.  unknown device id {device_id}")
         return
 
-    new_device_status = DeviceStatusLog(device=transmitting_device, supply_voltage=voltage,
-                                        supply_voltage_ticks=voltage_ticks,
-                                        water_pressure_ticks=water_pressure_ticks)
-    new_device_status.save()
+    build_and_save_device_status_log(transmitting_device, device_status)
 
-    # TODO: this is a hack until the device can tell us whether it can sprinkle
-    can_sprinkle = device_measured_enough_water_to_sprinkle_from_last_status(transmitting_device)
-
-    # attempt to execute any tasks we need to.  if we did, we're done.
-    tasks_executed = execute_scheduled_tasks(device=transmitting_device, can_sprinkle=can_sprinkle)
-    if tasks_executed:
-        return
-
-    # if the device should be awake now, don't tell it to do anything
-    device_should_be_awake = transmitting_device.should_be_awake_now()
-    if device_should_be_awake:
-        print(f"Telling device {device_id} to stay awake")
-        return
-
-    # if the device needs to be awake later today, put it to sleep for now
-    if transmitting_device.should_be_awake_later_today():
-        payload = {
-            'device_id': device_id,
-            'command': ServerToDeviceCommand.SLEEP.value,
-            'body': {
-                'sleep_length_minutes': "60" # TODO: scale this so it wakes up right after the scheduled task
-            }
-        }
-
-        return mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
-
-    # if we've made it here, the device doesn't have any tasks to accomplish now, doesn't need to be awake now,
-    # doesn't need to be awake later, and has no tasks later.  It should be shut off for the day
-    print(f"Telling device {device_id} to turn off")
-    payload = {
-        'device_id': device_id,
-        'command': ServerToDeviceCommand.POWER_OFF.value,
-    }
-
-    return mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
+    respond_to_device(transmitting_device)
 
 
 def device_measured_enough_water_to_sprinkle_from_last_status(device: IOTDevice) -> bool:
-    """
-    Based on last status, does the device have enough water to sprinkle?
-    :param device: IOTDevice
-    :return: bool - whether the device reported enough water to sprinkle or not
-    """
+
+    if not pressure_cal_configured(device):
+        return False
+
+    last_measured_ticks = get_measured_ticks_from_last_status_log(device)
+
+    if not last_measured_ticks:
+        return False
+
+    minimum_measured_ticks = get_minimum_measured_ticks(device)
+
+    return last_measured_ticks >= minimum_measured_ticks
+
+
+def pressure_cal_configured(device: IOTDevice) -> bool:
 
     if not device.cal_low_pressure_ticks or not device.cal_high_pressure_ticks:
         return False
 
-    last_status_qs = DeviceStatusLog.objects.filter(device=device).order_by('-created')[:1]
-    if not last_status_qs:
-        return False
+    return True
 
-    last_status: DeviceStatusLog = last_status_qs[0]
+
+def get_measured_ticks_from_last_status_log(device: IOTDevice) -> None | int:
+
+    last_status_log = DeviceStatusLog.objects.filter(device=device).order_by('-created')[:1]
+    if not last_status_log:
+        return None
+
+    last_status: DeviceStatusLog = last_status_log[0]
 
     last_measured_ticks = last_status.water_pressure_ticks
     if not last_measured_ticks:
-        return False
+        return None
 
-    min_percent = sprinkler_constants.MIN_PERCENT_TO_WATER
+    return last_measured_ticks
 
-    # interpolate to determine min ticks based on min percent
+
+def get_minimum_measured_ticks(device: IOTDevice):
     min_ticks = (device.cal_high_pressure_ticks -
-                 device.cal_low_pressure_ticks)*min_percent/100 + device.cal_low_pressure_ticks
+                 device.cal_low_pressure_ticks) * sprinkler_constants.MIN_PERCENT_TO_WATER / 100 + \
+                device.cal_low_pressure_ticks
 
-    return last_measured_ticks >= min_ticks
+    return min_ticks
 
 
+def get_device_by_id(device_id: int) -> IOTDevice | None:
+    device: IOTDevice | None = IOTDevice.objects.filter(device_id=device_id).first()
+
+    return device
+
+
+def build_and_save_device_status_log(device: IOTDevice, status: DeviceStatus):
+
+    new_device_status = DeviceStatusLog(device=device, supply_voltage=status.voltage,
+                                        supply_voltage_ticks=status.voltage_ticks,
+                                        water_pressure_ticks=status.water_pressure_ticks)
+    new_device_status.save()
+
+
+def respond_to_device(device: IOTDevice):
+    can_sprinkle = device_measured_enough_water_to_sprinkle_from_last_status(device)
+
+    # if any tasks are communicated, we need to wait for the device to carry out the commands.  then it will report
+    # status again
+    tasks_communicated = execute_scheduled_tasks(device=device, can_sprinkle=can_sprinkle)
+    if tasks_communicated:
+        return
+
+    device_should_be_awake = device.should_be_awake_now()
+    if device_should_be_awake:
+        tell_device_to_stay_awake(device)
+        return
+
+    if device.should_be_awake_later_today():
+        tell_device_to_sleep_for_one_hour(device)
+        return
+
+    tell_device_to_power_off(device)
+
+
+def tell_device_to_sleep_for_one_hour(device: IOTDevice):
+    payload = {
+        'device_id': device.device_id,
+        'command': ServerToDeviceCommand.SLEEP.value,
+        'body': {
+            'sleep_length_minutes': "60"  # TODO: scale this so it wakes up right after the scheduled task
+        }
+    }
+
+    mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
+
+
+def tell_device_to_power_off(device: IOTDevice):
+    print(f"Telling device {device.device_id} to turn off")
+    payload = {
+        'device_id': device.device_id,
+        'command': ServerToDeviceCommand.POWER_OFF.value,
+    }
+
+    mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
+
+
+def tell_device_to_stay_awake(device: IOTDevice):
+
+    print("Not actually doing anything because a 'stay_awake' command has not been implemented")

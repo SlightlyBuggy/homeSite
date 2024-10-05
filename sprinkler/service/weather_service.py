@@ -1,5 +1,5 @@
 import requests
-from sprinkler.classes.precip_observations import PrecipObservations
+from sprinkler.classes.PrecipObservations import PrecipObservations
 from sprinkler.models import RainLog
 from sprinkler.service import schedule_service
 import json

@@ -85,6 +85,11 @@ class IOTDevice(BaseModel):
 
         return False
 
+    def get_voltage_from_voltage_ticks(self, voltage_ticks):
+        voltage = (voltage_ticks - self.cal_low_ticks_voltage) * (self.cal_high_voltage - self.cal_low_voltage) / (
+                self.cal_high_ticks_voltage - self.cal_low_ticks_voltage) + self.cal_low_voltage
+        return voltage
+
     def should_be_awake_now(self):
         """
         Returns True if device should be awake now.  During this period,
