@@ -1,6 +1,6 @@
 from sprinkler.models import IOTDeviceSchedule, ScheduleTypes, IOTDevice
 from datetime import datetime, timezone
-from sprinkler.service import command_service
+from sprinkler.service import command_service, device_service
 import util.automation_utils as util
 
 
@@ -22,7 +22,7 @@ def execute_scheduled_tasks(device: IOTDevice, can_sprinkle):
         # check if schedule should be executed now
         if active_schedule.next_execution <= current_dt:
 
-            device: IOTDevice = IOTDevice.objects.get(pk=active_schedule.device.id)
+            device: IOTDevice = device_service.get_device_by_id(active_schedule.device.id)
 
             # handle each schedule type
             match active_schedule.schedule_type:
