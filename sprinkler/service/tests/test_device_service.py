@@ -1,8 +1,7 @@
 from django.test import TestCase
 from sprinkler.service import device_service
-from sprinkler.models import IOTDevice, SprinklerLog, ScheduleTypes, DeviceStatusLog
+from sprinkler.models import IOTDevice, SprinklerLog, DeviceStatusLog
 from datetime import datetime, timezone, timedelta
-import ast
 from sprinkler import constants
 from sprinkler.factories import iotdevice_factory, iotdeviceschedule_factory
 
@@ -77,13 +76,13 @@ class DeviceServiceTest(TestCase):
 
         device_service.handle_device_status(device_id=0, status=test_status)
 
-        # TODO: rework this with exectation of a command being logged
+        # TODO: rework this with expectation of a command being logged
         # self.assertEqual('command', self.last_message_topic)
         # self.assertEqual('power_off', self.last_message_body_dict['command'])
 
     def test_enough_water_to_sprinkle_on_threshold(self):
 
-        test_device: IOTDevice = IOTDevice.objects.filter(device_id=self.test_device_id)[0]
+        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -97,7 +96,7 @@ class DeviceServiceTest(TestCase):
         self.assertTrue(enough_water)
 
     def test_enough_water_to_sprinkle_has_enough_in_range(self):
-        test_device: IOTDevice = IOTDevice.objects.filter(device_id=self.test_device_id)[0]
+        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -114,7 +113,7 @@ class DeviceServiceTest(TestCase):
 
     def test_enough_water_to_sprinkle_not_enough_in_range(self):
 
-        test_device: IOTDevice = IOTDevice.objects.filter(device_id=self.test_device_id)[0]
+        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
 
         threshold_ticks = self.get_ticks_from_percentage_of_cal_range(constants.MIN_PERCENT_TO_WATER,
                                                                       test_device.cal_low_pressure_ticks,
@@ -129,7 +128,7 @@ class DeviceServiceTest(TestCase):
         self.assertFalse(enough_water)
 
     def test_enough_water_to_sprinkle_not_enough_out_of_range(self):
-        test_device: IOTDevice = IOTDevice.objects.filter(device_id=self.test_device_id)[0]
+        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
 
         ticks_to_test = test_device.cal_low_pressure_ticks - 1
 
@@ -141,7 +140,7 @@ class DeviceServiceTest(TestCase):
         self.assertFalse(enough_water)
 
     def test_enough_water_to_sprinkle_has_enough_out_of_range(self):
-        test_device: IOTDevice = IOTDevice.objects.filter(device_id=self.test_device_id)[0]
+        test_device: IOTDevice = device_service.get_device_by_id(self.test_device_id)
 
         ticks_to_test = test_device.cal_high_pressure_ticks + 1
 
