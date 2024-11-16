@@ -56,6 +56,7 @@ def create_rain_logs_from_precip_observations(precip_observations) -> bool:
     return new_log_created
 
 
+# TODO: use a different weather API.  This one is awful.  
 def get_precip_observations(test_file=None) -> PrecipObservations | None:
     """
     Fetch a report of precipitation specifically for KOJC from weather.gov

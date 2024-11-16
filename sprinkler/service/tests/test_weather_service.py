@@ -45,6 +45,6 @@ class WeatherServiceTest(TestCase):
         earlier_log = rain_logs[1]
         assert_event_is_complete(earlier_log, most_recent_log)
 
-    # TODO: create a test that verifies the automation overwrites the next execution when appropriate
-    # TODO: create a test that verifies the automation does NOT overwrite the next execution when it should not
+    # TODO: create a test that verifies the automation overwrites the next execution when appropriate (next execution is too close to last precip)
+    # TODO: create a test that verifies the automation does NOT overwrite the next execution when it should not (next execution is far enough away from last precip)
 
