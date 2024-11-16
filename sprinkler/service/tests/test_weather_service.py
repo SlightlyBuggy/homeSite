@@ -19,6 +19,17 @@ class WeatherServiceTest(TestCase):
         Verify the test response from the precip endpoint is properly translated to DB objects
         """
 
+        def assert_event_is_in_progress(rain_log: RainLog):
+            self.assertIsNone(rain_log.end_time)
+            self.assertIsNotNone(rain_log.start_time)
+            self.assertIsNotNone(rain_log.total_amount_inches)
+
+        def assert_event_is_complete(first_log: RainLog, second_log: RainLog):
+            self.assertIsNotNone(first_log.end_time)
+            self.assertIsNotNone(first_log.start_time)
+            self.assertIsNotNone(second_log.total_amount_inches)
+            self.assertTrue(first_log.end_time > first_log.start_time)
+
         weather_service.get_and_record_precip_observations(test_file=self.get_test_file_path())
 
         rain_logs: list[RainLog] = RainLog.objects.all().order_by('-start_time')
@@ -28,13 +39,12 @@ class WeatherServiceTest(TestCase):
 
         # the most recent log should be in progress, i.e. no end time
         most_recent_log = rain_logs[0]
-        self.assertEqual(most_recent_log.end_time, None)
-        self.assertNotEqual(most_recent_log.start_time, None)
-        self.assertNotEqual(most_recent_log.total_amount_inches, None)
+        assert_event_is_in_progress(most_recent_log)
 
         # the earlier log should record a complete event, i.e. has an end time
         earlier_log = rain_logs[1]
-        self.assertNotEqual(earlier_log.end_time, None)
-        self.assertNotEqual(earlier_log.start_time, None)
-        self.assertNotEqual(most_recent_log.total_amount_inches, None)
-        self.assertTrue(earlier_log.end_time > earlier_log.start_time)
+        assert_event_is_complete(earlier_log, most_recent_log)
+
+    # TODO: create a test that verifies the automation overwrites the next execution when appropriate
+    # TODO: create a test that verifies the automation does NOT overwrite the next execution when it should not
+

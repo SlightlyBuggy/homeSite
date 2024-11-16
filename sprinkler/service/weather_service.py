@@ -23,15 +23,20 @@ def get_and_record_precip_observations(test_file=None) -> PrecipObservations | N
 
     # ensure each observation is captured in the database
     if precip_observations:
-        create_rain_logs_from_precip_observations(precip_observations=precip_observations)
+        new_log_created = create_rain_logs_from_precip_observations(precip_observations=precip_observations)
 
-        #TODO: need way to manually override next schedule without automation fighting
-        schedule_service.update_sprinkle_schedules()
+        # TODO: a better solution would be to have the creation timestamp in the rain log object
+        # then we can have a function like update_device_schedules_based_on_precip() which queries
+        # the DB and looks for any logs created very recently
+        if new_log_created:
+            schedule_service.update_sprinkle_schedules()
 
     return precip_observations
 
 
-def create_rain_logs_from_precip_observations(precip_observations):
+def create_rain_logs_from_precip_observations(precip_observations) -> bool:
+    new_log_created = False
+
     for precip_event in precip_observations.precip_events:
 
         # check for a precip event with this start time.  if we have it, update its data
@@ -46,6 +51,9 @@ def create_rain_logs_from_precip_observations(precip_observations):
             new_rain_log = RainLog(start_time=precip_event.start, end_time=precip_event.end,
                                    total_amount_inches=convert_mm_to_in(precip_event.total_mm))
             new_rain_log.save()
+            new_log_created = True
+
+    return new_log_created
 
 
 def get_precip_observations(test_file=None) -> PrecipObservations | None:
