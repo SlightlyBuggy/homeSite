@@ -12,14 +12,14 @@ def convert_mm_to_in(length_in_mm):
     return 0
 
 
-def get_and_record_precip_observations(test_file=None) -> PrecipObservations | None:
+def get_and_record_precip_observations(test_observations=None) -> PrecipObservations | None:
     """
     Fetch precip observations from weather data source and upsert them to the db
 
-    :param test_file: path to local data
+    :param test_observations: raw observation data for test
     :return:
     """
-    precip_observations: PrecipObservations | None = get_precip_observations(test_file)
+    precip_observations: PrecipObservations | None = get_precip_observations(test_observations)
 
     # ensure each observation is captured in the database
     if precip_observations:
@@ -36,7 +36,8 @@ def get_and_record_precip_observations(test_file=None) -> PrecipObservations | N
 
 def create_rain_logs_from_precip_observations(precip_observations) -> bool:
     new_log_created = False
-
+    # TODO: need to heal the case where the very first entry in the DB has precip happening.  it won't have a start time
+    # due to no rising edge.  need to give it a start time
     for precip_event in precip_observations.precip_events:
 
         # check for a precip event with this start time.  if we have it, update its data
@@ -57,18 +58,14 @@ def create_rain_logs_from_precip_observations(precip_observations) -> bool:
 
 
 # TODO: use a different weather API.  This one is awful.  
-def get_precip_observations(test_file=None) -> PrecipObservations | None:
+def get_precip_observations(test_raw_data=None) -> PrecipObservations | None:
     """
     Fetch a report of precipitation specifically for KOJC from weather.gov
     :return:
     """
 
-    if test_file:
-        if not os.path.exists(test_file):
-            raise FileNotFoundError(f"cannot find test file {test_file}")
-        with open(test_file) as test_file:
-            data = json.load(test_file)
-            return PrecipObservations(raw_data=data)
+    if test_raw_data:
+        return PrecipObservations(raw_data=test_raw_data)
 
     ret_val = None
     url = 'https://api.weather.gov/stations/KOJC/observations'

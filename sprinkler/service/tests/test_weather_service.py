@@ -1,18 +1,10 @@
 from django.test import TestCase
 import sprinkler.service.weather_service as weather_service
 from sprinkler.models import RainLog
-import os
+from sprinkler.factories import precipitationrawdata_factory
 
 
 class WeatherServiceTest(TestCase):
-
-    @staticmethod
-    def get_test_file_path():
-        this_dir = os.path.dirname(os.path.realpath(__file__))
-        parent_dir = os.path.dirname(this_dir)
-        parent_of_parent = os.path.dirname(parent_dir)
-        test_file_path = os.path.join(parent_of_parent, 'resources', 'precip_observations_test_data.json')
-        return test_file_path
 
     def test_get_and_record_precip_observations_no_schedules(self):
         """
@@ -30,7 +22,9 @@ class WeatherServiceTest(TestCase):
             self.assertIsNotNone(second_log.total_amount_inches)
             self.assertTrue(first_log.end_time > first_log.start_time)
 
-        weather_service.get_and_record_precip_observations(test_file=self.get_test_file_path())
+        test_observations = precipitationrawdata_factory.build_raw_precip_data_rain_ended_two_hours_ago_and_ongoing()
+
+        weather_service.get_and_record_precip_observations(test_observations=test_observations)
 
         rain_logs: list[RainLog] = RainLog.objects.all().order_by('-start_time')
 
