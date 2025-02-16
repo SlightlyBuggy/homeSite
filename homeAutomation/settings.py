@@ -129,7 +129,7 @@ STATIC_ROOT = './static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MQTT_SERVER = '127.0.0.1'
+MQTT_SERVER = '127.0.0.1'  # use host.docker.internal if we want to use mqtt running on host
 MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
 MQTT_USER = ''

@@ -1,0 +1,19 @@
+services:
+
+  mosquitto:
+    image: eclipse-mosquitto
+    hostname: mosquitto
+    container_name: mosquitto
+    restart: unless-stopped
+    ports:
+      - "1883:1883"
+    volumes:
+      - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf  #host : container
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MQTT_SERVER=mosquitto
+
+

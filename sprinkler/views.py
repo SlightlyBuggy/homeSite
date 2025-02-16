@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import IOTDevice
+from sprinkler.classes.RealMqttClient import RealMqttClient
 
 
 def device_status(request):
