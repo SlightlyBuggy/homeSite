@@ -4,3 +4,4 @@
 static/admin/*
 static/sprinkler/*.*
 .idea/
+postgres_data

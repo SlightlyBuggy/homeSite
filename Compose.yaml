@@ -24,6 +24,8 @@ services:
       interval: 10s
       timeout: 3s
       retries: 3
+    volumes:
+       - ./postgres_data:/var/lib/postgresql/data
 
   web:
     build: .
@@ -40,3 +42,7 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+
+# TODO: figure out how to migrate automatically... ?
+# right now, connect to container and run 'python manage.py migrate'
+# then run 'python manage.py createuseruser' then follow prompts
