@@ -78,9 +78,13 @@ WSGI_APPLICATION = 'homeAutomation.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+        'ENGINE': os.getenv('DATABASE_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.getenv('DATABASE_NAME', BASE_DIR / 'db.sqlite3'),
+        'USER': os.getenv('DATABASE_USER', 'user'),
+        'PASSWORD': os.getenv('DATABASE_PASSWORD', 'password'),
+        'HOST': os.getenv('DATABASE_HOST', 'localhost'),
+        'PORT': os.getenv('DATABASE_PORT', '5432')
+    },
 }
 
 

@@ -9,11 +9,34 @@ services:
       - "1883:1883"
     volumes:
       - ./mosquitto/mosquitto.conf:/mosquitto/config/mosquitto.conf  #host : container
+
+  postgres:
+    container_name: postgres
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+    healthcheck:
+      test: [ "CMD-SHELL", "sh -c 'pg_isready -U postgres -d postgres'" ]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
   web:
     build: .
     ports:
       - "8000:8000"
     environment:
       - MQTT_SERVER=mosquitto
-
-
+      - DATABASE_ENGINE=django.db.backends.postgresql
+      - DATABASE_NAME=postgres
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=postgres
+      - DATABASE_HOST=postgres
+      - DATABASE_PORT=5432
+    depends_on:
+      postgres:
+        condition: service_healthy
