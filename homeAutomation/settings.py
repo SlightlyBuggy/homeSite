@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-+ha&wd&f=z9_6fzp6mslyiz6ixq(cfqh5f5vwf$ahl^k13&3^#
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["192.168.0.170", '127.0.0.1', 'localhost', '.hunterandmarykate.org', '192.168.0.232']
+ALLOWED_HOSTS = ["192.168.0.170", '127.0.0.1', 'localhost', '.hunterandmarykate.org', '192.168.0.232', '192.168.0.132']
 
 
 # Application definition
@@ -133,7 +133,7 @@ STATIC_ROOT = './static'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-MQTT_SERVER = '127.0.0.1'  # use host.docker.internal if we want to use mqtt running on host
+MQTT_SERVER = os.getenv('BROKER_URL', '127.0.0.1')  # use host.docker.internal if we want to use mqtt running on host
 MQTT_PORT = 1883
 MQTT_KEEPALIVE = 60
 MQTT_USER = ''
