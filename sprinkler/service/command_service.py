@@ -1,6 +1,6 @@
 import util.automation_utils as util
 import sprinkler.service.mqtt_service as mqtt
-from sprinkler.models import IOTDeviceSchedule, IOTDevice, ServerToDeviceCommand
+from sprinkler.models import IOTDeviceSchedule, IOTDevice, ServerToDeviceCommand, ServerToDeviceCommandLog
 from datetime import datetime, timezone
 from django.views.decorators.csrf import csrf_exempt
 from sprinkler import constants
@@ -15,12 +15,7 @@ def handle_status_command(device: IOTDevice):
     :return:
     """
 
-    status_body = {
-        'device_id': device.device_id,
-        'command': ServerToDeviceCommand.STATUS.value
-    }
-
-    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, status_body)
+    mqtt_response = send_command(device=device, command=ServerToDeviceCommand.STATUS.value)
     return
 
 
@@ -44,17 +39,15 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
     current_dt = datetime.now(timezone.utc)
 
     # if we've gotten here, we need to command the device to start watering
-    water_body = {
-        'device_id': device.device_id,
-        'command': ServerToDeviceCommand.SPRINKLE_START.value,
-        'body': {
-            'watering_length_minutes': str(device.watering_length_minutes),
-            'watering_wait_minutes': str(device.watering_wait_minutes),
-            'watering_repetitions': str(device.watering_repetitions),
-        }
+
+    command_body = {
+        'watering_length_minutes': str(device.watering_length_minutes),
+        'watering_wait_minutes': str(device.watering_wait_minutes),
+        'watering_repetitions': str(device.watering_repetitions),
     }
 
-    mqtt_response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, water_body)
+    mqtt_response = send_command(device=device, command=ServerToDeviceCommand.SPRINKLE_START.value,
+                                 command_body=command_body)
 
     # update the schedule
     schedule.next_execution = util.get_next_schd_using_start_time(schedule=schedule, starting_at=current_dt)
@@ -72,3 +65,16 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
     sprinkle_log.save()
 
     return True
+
+# TODO: need test coverage of this function
+def send_command(device: IOTDevice, command: ServerToDeviceCommand, command_body=None):
+
+    # TODO: allow null in ServerToDeviceCommandLog?
+    if command_body is None:
+        command_body = {}
+    command_log = ServerToDeviceCommandLog(device=device, command=command, body=command_body)
+    command_log.save()
+
+    command_dict = command_log.__dict__
+    response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, command_dict)
+    return response

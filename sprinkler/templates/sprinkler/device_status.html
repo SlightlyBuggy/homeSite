@@ -19,26 +19,26 @@
         <div class="iot-device-container">
             <table>
                 <th>Name</th>
-                <th>Device Id</th>
-                <th>Status</th>
-                <th>Status time</th>
+                <th>Id</th>
+                <th>Last Command</th>
+                <th>Command Time</th>
+                <th>Last Status Time</th>
                 <th>Voltage</th>
-                <th>Pressure ticks</th>
+                <th>Water</th>
                 <th>Commands</th>
                 {% for device in all_devices %}
                     <tr>
                         <td>{{device.name}}</td>
                         <td>{{device.device_id}}</td>
-                        <td>
-                            {% if device.should_be_awake %}
-                                <div class="device-status-online">Online</div>
-                            {% else %}
-                                <div class="device-status-offline">Asleep/Offline</div>
-                            {% endif %}
-                        </td>
+                        <td>{{device.get_latest_command.command}}</td>
+                        <td>{{device.get_latest_command.created|localtime }}</td>
                         <td>{{device.get_latest_status.created|localtime }}</td>
                         <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
-                        <td>{{device.get_latest_status.water_pressure_ticks|floatformat:2}}</td>
+                        {% if device.has_water_calibration %}
+                            <td>{{device.get_latest_status.get_percentage_full|floatformat}}% ({{device.get_latest_status.water_pressure_ticks|floatformat:2}} ticks)</td>
+                        {% else %}
+                            <td>Calibration missing! ({{device.get_latest_status.water_pressure_ticks|floatformat:2}} ticks)</td>
+                        {% endif %}
                         <td>
                             <button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button>
                             <button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button>

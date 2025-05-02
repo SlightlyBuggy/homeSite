@@ -1,3 +1,5 @@
+import uuid
+
 from django.db import models
 from datetime import datetime, timezone
 
@@ -63,6 +65,12 @@ class IOTDevice(BaseModel):
         except IndexError:
             pass
 
+    def get_latest_command(self):
+        try:
+            return self.servertodevicecommandlog_set.all().order_by('-created')[0]
+        except IndexError:
+            pass
+
     def today_active_schedules(self):
 
         current_dt = datetime.now(timezone.utc)
@@ -102,6 +110,9 @@ class IOTDevice(BaseModel):
             return True
 
         return False
+
+    def has_water_calibration(self):
+        return self.cal_low_pressure_ticks is not None and self.cal_high_pressure_ticks is not None
 
     def __str__(self):
         return f"{self.device_id} - {self.name}"
@@ -213,8 +224,28 @@ class DeviceStatusLog(BaseModel):
         return f"{self.device.name} - {self.created.strftime('%Y-%m-%d %H:%M:%S')} | {self.supply_voltage} V | " \
                f"{self.water_pressure_ticks} water pressure ticks"
 
+    def get_percentage_full(self):
+        if (self.device.cal_low_pressure_ticks is None or
+                self.device.cal_high_pressure_ticks is None or
+                self.water_pressure_ticks is None):
+            return 0
+
+        diff_between_cal_points = self.device.cal_high_pressure_ticks - self.device.cal_low_pressure_ticks
+        diff_between_measured_and_low_cal = self.water_pressure_ticks - self.device.cal_low_pressure_ticks
+
+        return diff_between_measured_and_low_cal / diff_between_cal_points * 100
 
 # store global settings - not sure what exactly, but it might be useful
 class Setting(BaseModel):
     key = models.TextField()
     value = models.TextField()
+
+# server to device commands
+class ServerToDeviceCommandLog(BaseModel):
+    device = models.ForeignKey(IOTDevice, on_delete=models.CASCADE)
+    command = models.CharField(max_length=100, choices=ServerToDeviceCommand.choices,)
+    command_id = models.UUIDField(auto_created=True, default=uuid.uuid4, editable=False)
+    body = models.JSONField()
+
+    def __str__(self):
+        return f"Device '{self.device.name}' (ID {self.device.device_id}), Command: {self.command}"
