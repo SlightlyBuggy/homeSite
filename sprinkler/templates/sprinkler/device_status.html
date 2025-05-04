@@ -15,14 +15,13 @@
 <body>
 <div class="outer-container">
     <div class="inner-container">
-        <div class="device-status-heading">IOT devices</div>
+        <div class="device-status-heading">Rain Barrel Devices</div>
         <div class="iot-device-container">
             <table>
                 <th>Name</th>
                 <th>Id</th>
                 <th>Last Command</th>
-                <th>Command Time</th>
-                <th>Last Status Time</th>
+                <th>Last Online</th>
                 <th>Voltage</th>
                 <th>Water</th>
                 <th>Commands</th>
@@ -30,8 +29,7 @@
                     <tr>
                         <td>{{device.name}}</td>
                         <td>{{device.device_id}}</td>
-                        <td>{{device.get_latest_command.command}}</td>
-                        <td>{{device.get_latest_command.created|localtime }}</td>
+                        <td>{{device.get_latest_command.command}} - {{device.get_latest_command.created|localtime }}</td>
                         <td>{{device.get_latest_status.created|localtime }}</td>
                         <td>{{device.get_latest_status.supply_voltage|floatformat:2}}</td>
                         {% if device.has_water_calibration %}

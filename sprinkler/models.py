@@ -2,6 +2,7 @@ import uuid
 
 from django.db import models
 from datetime import datetime, timezone
+from django.utils import timezone
 
 
 # base class that handles created/edited fields
@@ -63,18 +64,22 @@ class IOTDevice(BaseModel):
         try:
             return self.devicestatuslog_set.all().order_by('-created')[0]
         except IndexError:
-            pass
+            return None
 
     def get_latest_command(self):
         try:
             return self.servertodevicecommandlog_set.all().order_by('-created')[0]
         except IndexError:
-            pass
+            return None
 
-    def today_active_schedules(self):
+    def get_today_active_schedules(self):
 
         current_dt = datetime.now(timezone.utc)
-        current_date = current_dt.date()
+
+        # if a device checks in at 7:30 p.m. CDT, that would be 00:30 the next day UTC.  Need to compare in local time
+        # so we don't say there's a schedule today when really it's the next day
+        local_dt = timezone.localtime(current_dt)
+        current_date = local_dt.date()
 
         these_active_device_schedules = self.iotdeviceschedule_set.all().filter(active=True)
 
@@ -86,7 +91,7 @@ class IOTDevice(BaseModel):
         return pending_schedules, future_schedules_today
 
     def should_be_awake_later_today(self):
-        pending_schedules, future_schedules = self.today_active_schedules()
+        pending_schedules, future_schedules = self.get_today_active_schedules()
 
         if future_schedules:
             return True
