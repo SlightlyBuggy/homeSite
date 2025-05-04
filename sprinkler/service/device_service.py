@@ -2,8 +2,8 @@ from sprinkler.models import ServerToDeviceCommand
 from sprinkler.service.schedule_service import execute_scheduled_tasks
 from sprinkler.models import DeviceStatusLog, IOTDevice
 import sprinkler.constants as sprinkler_constants
-import sprinkler.service.mqtt_service as mqtt
 from sprinkler.classes.ParsedDeviceStatus import DeviceStatus
+from sprinkler.service.command_service import send_command
 
 
 def handle_device_status(device_id, status) -> None:
@@ -102,25 +102,18 @@ def respond_to_device(device: IOTDevice):
 
 
 def tell_device_to_sleep_for_one_hour(device: IOTDevice):
-    payload = {
-        'device_id': device.device_id,
-        'command': ServerToDeviceCommand.SLEEP.value,
-        'body': {
-            'sleep_length_minutes': "60"  # TODO: scale this so it wakes up right after the scheduled task
-        }
-    }
 
-    mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
+    command_body = { 'sleep_length_minutes': "60" }
+
+    send_command(device, ServerToDeviceCommand.SLEEP.value, command_body=command_body)
 
 
 def tell_device_to_power_off(device: IOTDevice):
     print(f"Telling device {device.device_id} to turn off")
-    payload = {
-        'device_id': device.device_id,
-        'command': ServerToDeviceCommand.POWER_OFF.value,
-    }
 
-    mqtt.client.send_mqtt_message(sprinkler_constants.COMMAND_TOPIC, str(payload))
+    command_body = {'sleep_length_minutes': "60"}
+
+    send_command(device, ServerToDeviceCommand.POWER_OFF.value, command_body=command_body)
 
 
 def tell_device_to_stay_awake(device: IOTDevice):

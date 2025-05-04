@@ -13,5 +13,6 @@ urlpatterns = [
     path('ping_devices_for_status', schedule.ping_devices_for_status,
          name='ping_devices_for_status'),
     path('get_precip_observations', precipitation.get_precip_observations, name='get_precip_observations'),
+    # TODO: figure out if this is used for anything
     path('publish', mqtt.publish_message, name='publish'),
 ]
