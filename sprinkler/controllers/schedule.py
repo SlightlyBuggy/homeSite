@@ -15,6 +15,6 @@ def ping_devices_for_status(request):
     devices: list[IOTDevice] = IOTDevice.objects.all()
 
     for device in devices:
-        command_service.handle_status_command(device=device)
+        command_service.handle_status_command(device=device, log_command=False)
 
     return HttpResponse()

@@ -7,15 +7,16 @@ from sprinkler import constants
 
 
 @csrf_exempt
-def handle_status_command(device: IOTDevice):
+def handle_status_command(device: IOTDevice, log_command=True):
     """
     Handle a device status command.
 
     :param device: IOTDevice
+    :param log_command: boolean - determines where a command log is generated from the status command
     :return:
     """
 
-    mqtt_response = send_command(device=device, command=ServerToDeviceCommand.STATUS.value)
+    mqtt_response = send_command(device=device, command=ServerToDeviceCommand.STATUS.value, log_command=log_command)
     return
 
 
@@ -67,14 +68,15 @@ def handle_sprinkle_command(schedule: IOTDeviceSchedule, device: IOTDevice, can_
     return True
 
 # TODO: need test coverage of this function
-def send_command(device: IOTDevice, command: ServerToDeviceCommand, command_body=None):
+def send_command(device: IOTDevice, command: ServerToDeviceCommand, command_body=None, log_command=True):
 
     # TODO: allow null in ServerToDeviceCommandLog?
     if command_body is None:
         command_body = {}
     command_log = ServerToDeviceCommandLog(device=device, command=command, body=command_body)
-    command_log.save()
+    if log_command:
+        command_log.save()
 
-    command_dict = command_log.__dict__
+    command_dict = command_log.get_device_payload()
     response = mqtt.client.send_mqtt_message(constants.COMMAND_TOPIC, command_dict)
     return response

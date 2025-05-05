@@ -254,3 +254,12 @@ class ServerToDeviceCommandLog(BaseModel):
 
     def __str__(self):
         return f"Device '{self.device.name}' (ID {self.device.device_id}), Command: {self.command}"
+
+    def get_device_payload(self):
+        payload = {
+            'device_id': self.device.device_id,
+            'command': self.command,
+            'body': self.body
+        }
+        return payload
+
