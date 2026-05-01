@@ -24,7 +24,6 @@
                 <th>Last Online</th>
                 <th>Voltage</th>
                 <th>Water</th>
-                <th>Commands</th>
                 {% for device in all_devices %}
                     <tr>
                         <td>{{device.name}}</td>
@@ -37,18 +36,18 @@
                         {% else %}
                             <td>Calibration missing! ({{device.get_latest_status.water_pressure_ticks|floatformat:2}} ticks)</td>
                         {% endif %}
-                        <td>
-                            <button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button>
-                            <button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button>
-                            <button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button>
-                            {% comment %} TODO: rework this to sprinkle for X minutes {% endcomment %}
-                            <button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button>
-                            <button data-request_type="sprinkle-cycle" data-device_id="{{device.device_id}}">Sprinkle 3 cycles</button>
-                            <button data-request_type="sleep-1-min" data-device_id="{{device.device_id}}">Sleep for 1 min</button>
-                            <button data-request_type="switch-broker-debug" data-device_id="{{device.device_id}}">Switch to debug broker</button>
-                            <button data-request_type="switch-broker-prod" data-device_id="{{device.device_id}}">Switch to prod broker</button>
-                            <button data-request_type="power-off" data-device_id="{{device.device_id}}">Power Off</button>
-                        </td>
+<!--                        <td>-->
+<!--                            <button data-request_type="status" data-device_id="{{device.device_id}}">Get Status</button>-->
+<!--                            <button data-request_type="sprinkle-on" data-device_id="{{device.device_id}}">Start Sprinkle</button>-->
+<!--                            <button data-request_type="sprinkle-off" data-device_id="{{device.device_id}}">Stop Sprinkle</button>-->
+<!--                            {% comment %} TODO: rework this to sprinkle for X minutes {% endcomment %}-->
+<!--                            <button data-request_type="sprinkle-1-min" data-device_id="{{device.device_id}}">Sprinkle 1 minute</button>-->
+<!--                            <button data-request_type="sprinkle-cycle" data-device_id="{{device.device_id}}">Sprinkle 3 cycles</button>-->
+<!--                            <button data-request_type="sleep-1-min" data-device_id="{{device.device_id}}">Sleep for 1 min</button>-->
+<!--                            <button data-request_type="switch-broker-debug" data-device_id="{{device.device_id}}">Switch to debug broker</button>-->
+<!--                            <button data-request_type="switch-broker-prod" data-device_id="{{device.device_id}}">Switch to prod broker</button>-->
+<!--                            <button data-request_type="power-off" data-device_id="{{device.device_id}}">Power Off</button>-->
+<!--                        </td>-->
                     </tr>
                 {% endfor %}
             </table>

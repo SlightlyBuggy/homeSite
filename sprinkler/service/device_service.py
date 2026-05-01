@@ -94,6 +94,7 @@ def respond_to_device(device: IOTDevice):
         tell_device_to_stay_awake(device)
         return
 
+    # no reason to go to sleep mode (using more power than simply being off) if we don't have enough water anyway
     if device.should_be_awake_later_today() and can_sprinkle:
         tell_device_to_sleep_for_one_hour(device)
         return

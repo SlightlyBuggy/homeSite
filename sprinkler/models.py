@@ -21,15 +21,6 @@ class IOTDevice(BaseModel):
 
     name = models.CharField(max_length=200)
 
-    # peripheral devices.  only water level sensor and pump are planned initially, but later models could add things
-    # like a flow sensor, rain sensor, etc
-    has_water_level_pressure_sensor = models.BooleanField(default=False)
-    has_watering_pump = models.BooleanField(default=False)
-
-    # water storage configuration
-    num_barrels = models.IntegerField(null=True)
-    barrel_cross_sectional_area_in2 = models.FloatField(null=True)
-
     # watering config
     # to allow the soil to absorb water, the sprinkler will run for watering_length_minutes, then wait for
     # watering_wait_minutes, and do that watering_repetitions times
@@ -54,8 +45,8 @@ class IOTDevice(BaseModel):
     cal_high_voltage = models.FloatField(null=True)
 
     # calibration for water pressure
-    cal_low_pressure_ticks = models.IntegerField(null=True)
-    cal_high_pressure_ticks = models.IntegerField(null=True)
+    cal_low_pressure_ticks = models.IntegerField(null=True, blank=True)
+    cal_high_pressure_ticks = models.IntegerField(null=True, blank=True)
 
     # override to allow manual control
     stay_awake = models.BooleanField(default=False)
